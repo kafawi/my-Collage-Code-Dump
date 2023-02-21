@@ -1,0 +1,26 @@
+{
+	"files":[{
+			"file_name":"test/TestManager.cc",
+			"err_ids":[{
+					"errid":"0",
+					"line":"4",
+					"row":"10",
+					"decription":"'test/TestManager.h' file not found ;;; ^~~~~~~~~~~~~~~~~~~~",
+					"type":"fatal error"
+				},
+				{
+					"errid":"1",
+					"line":"4",
+					"row":"10",
+					"decription":"'test/TestManager.h' file not found ;;; ^~~~~~~~~~~~~~~~~~~~",
+					"type":"fatal error"
+				}
+			]
+		}
+	],
+	"stats":{
+		"numberOfLines":"2804",
+		"numberOfErrors":"2",
+		"numberOfWarnings":"0"
+	}
+}

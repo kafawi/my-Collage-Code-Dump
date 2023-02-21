@@ -1,0 +1,58 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    service: cies-world
+  name: cies-world
+spec:
+  selector:
+    matchLabels:
+      service: cies-world
+  template:
+    metadata:
+      labels:
+        service: cies-world
+    spec:
+      containers:
+      - image: nexus.informatik.haw-hamburg.de/cies-world
+        name: cies-world
+        ports:
+        - containerPort: 80
+          protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: cies-world
+  name: cies-world
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    service: cies-world
+  type: ClusterIP
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+  name: tls-secret
+  namespace: cies-nginxdeploy
+spec:
+  tls:
+  - hosts:
+    - cies.tessa.haw-hamburg.de
+    secretName: tls-secret
+  rules:
+  - host: cies.tessa.haw-hamburg.de
+    http:
+      paths:
+      - path: /
+        backend:
+            serviceName: cies-world
+            servicePort: http

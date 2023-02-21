@@ -1,0 +1,793 @@
+% RDD - entsprechend der Vorlage von Thomas Lehmann
+\documentclass[
+   draft=false
+  ,paper=a4
+  ,twoside=true
+  ,fontsize=11pt
+  ,headsepline
+  ,DIV11
+  ,parskip=full+
+]{scrartcl} % copied from Thesis Template from HAW
+
+
+%--------------------------------------- HIER Versionsnummer inkrementieren, 
+%------------------------------- auch gerne 0.1.1 ... wenn nur minor changes
+\def\ver{0.2}
+
+
+\usepackage{scrpage2} %Sorgt für erweiterte Formatierungsmöglichkeiten bei KOMA, wie eben Seitenzahlen-Position
+\usepackage[ngerman,english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\addtokomafont{disposition}{\rmfamily}
+\renewcommand{\rmdefault}{ptm}
+\renewcommand*{\familydefault}{\rmdefault}
+
+%== Formatierungsschemata ==%
+\pagestyle{scrheadings} %Seitenstil festlegen, damit die folgenden Einträge auch wirksam sind
+\cfoot{} %center, Fuß, {} = ohne Eintrag
+\chead{} %center, Kopf, {} = ohne Eintrag
+\ofoot{\pagemark} %Außen, Fuß, Seitenzahl
+\ohead{\headmark}
+
+\renewcommand*\titlepagestyle{empty} % unterdrückt seitenzahl
+\usepackage[
+    left  =7em
+   ,right =7em
+   ,top   =8em
+   ,bottom=8em
+]{geometry}
+
+
+\usepackage{longtable}
+\usepackage[german,refpage]{nomencl}
+
+\usepackage{float}
+\usepackage{enumitem}
+\usepackage{hyperref} % for a better experience
+\urlstyle{same}
+
+\hypersetup{
+   colorlinks=true % if false - links get colored frames
+  ,linkcolor=black % color of tex intern links
+  ,urlcolor=blue   % color of url links
+}
+
+\usepackage{amsmath}
+\usepackage{graphicx}
+
+
+\usepackage{array}   % for \newcolumntype macro
+\newcolumntype{L}{>{$}l<{$}} % math-mode version of "l" column type
+\newcolumntype{R}{>{$}r<{$}} % math-mode version of "r" column type
+\newcolumntype{C}{>{$}c<{$}} % math-mode version of "c" column type
+
+\usepackage{listing}
+\usepackage{caption}
+\usepackage{colortbl}
+\definecolor{tabgrey}{rgb}{0.85,0.85,0.85}
+
+\sloppy
+\clubpenalty=10000
+\widowpenalty=10000
+\displaywidowpenalty=10000
+
+\begin{document}
+\selectlanguage{ngerman}
+\begin{titlepage}
+\title{Usecase Tabellen \\ (RDD)}
+%\subject{subject: Beispiel}
+\subtitle{Version \ver \\ \vspace{1em} ESEP – Praktikum – Sommersemester 2017 }
+\author{ LANKE \\
+\normalsize{
+\begin{tabular}{l l l l} 
+Hartmann   & Lennart     & 1234567 & \url{Lennart.Hartmann@haw-hamburg.de} \\
+Mendel     & Alexander   & 2188808 & \url{Alexander.Mendel@haw-hamburg.de} \\
+Eggebrecht & Nils        & 1234567 & \url{Nils.Eggebrecht@haw-hamburg.de} \\
+Witte      & Karl-Fabian & 2246435 & \url{Karl-Fabian.Witte@haw-hamburg.de} \\
+Veit       & Eduard      & 1234567 &  \url{Eduard.Veit@haw-hamburg.de} \\
+\end{tabular}}}
+\dedication{
+\normalsize{
+\begin{tabular}{|l |l |l |p{25em}|}
+\multicolumn{4}{l}{ \Large{Änderungshistorie:}} \\
+\hline 
+\rowcolor{tabgrey} \textbf{Version} & \textbf{Autor} & \textbf{Datum} & \textbf{Anmerkungen/Änderungen} \\
+\hline
+0.1 &
+K.Witte &
+04.04.2017 &
+Aus der Vorlage (Version 0.5 ) von Prof Lehmann doc2tex, \newline um es in Git besser pflegen zu können \\
+\hline
+0.1.1 &
+K.Witte &
+11.04.2017 &
+Es wurden Tabellenvorlagen für die Requirements und Use Cases hinzugefügt (Wave und Kite lvl)\\ 
+\hline
+0.2 & 
+A. Mendel &
+18.04.2017 &
+Getrennte Version des RDDs für die Tabellen\\
+\hline
+
+\end{tabular}
+}}
+\date{Hamburg, den \today }
+
+\maketitle
+%\texttt {Dieses Dokument ist noch nicht Abgeschlossen. Es werden noch Änderungen benötigt.}
+\end{titlepage}
+
+\newpage
+ 
+
+\setcounter{page}{1}
+\flushleft
+
+\pagenumbering{roman}
+
+\newpage
+\tableofcontents
+\newpage
+
+
+
+\pagenumbering {arabic}
+\section{Wave Level}
+!!Namensgebung der Akteure vorest entsprechend Meeting 24.03.17 (Deutsche Namen)
+\newline
+\newline
+\begin{table}[htp]
+\caption{WAVE LVL USE CASE}
+\label{tab:usecase_wave}
+
+\begin{tabular}{|p{0.3\linewidth}| p{0.7\linewidth} |}
+	\hline 
+	\rowcolor{tabgrey} \textbf{Name} & \textbf{Puck mit Bohrung unten regulär} \\
+	\hline
+
+	Akteur & 
+	\frqq Lichtschranke.inHoehenmessung\flqq, \frqq Lichtschranke.einlauf\flqq, \frqq Messung.hoehe\flqq und alle sonstigen eigentlich auch \\ \hline
+	Auslösendes Ereignis &
+		Das Ergebnis von \frqq Messung.hoehe\flqq  \\ \hline
+	Kurzbeschreibung & 
+		Die Hoehenmessung ergibt einen Wert, der nicht einer Bohrung, nicht dem eines flachen Werkstückes oder nicht eines Bohrungstyps (1, 2, 4, 5) entspricht und sortiert dementsprechend auf die Rutsche aus \\ \hline
+		
+	Vorbedingungen & 
+		\frqq Lichtschranke.rutscheVoll\flqq frei\\ \hline
+	Essentielle Schritte &
+		\begin{tabular}{|p{0.4\linewidth}|p{0.52\linewidth}|}
+		\hline
+			\rowcolor{tabgrey} \textbf{Intention \newline der Systemumgebung} & \textbf{Reaktion des Systems} \\ \hline \rowcolor{white}
+
+			Schritt 1: \frqq Messung.hoehe\flqq ergibt \emph{Bohrung unten regulär} &
+				Reaktion 1: Typerkennungsausgabe auf Konsole \newline
+				
+		\end{tabular} \\ \hline
+	
+	Ausnahmefälle &
+		Später einfügen, Initial nur Normalverhalten \\ \hline
+	Nachbedingungen & 
+		Können wir noch nicht festlegen\\ \hline
+	Zeitverhalten &
+		...(muss hier etwas hin, wegen wenn zu früh oder zu spät?)  \\ \hline
+	Verfügbarkeit & 
+		...(So etwas wie erwartete / notwendige MTBF o.ä.) \\ \hline
+	Fragen/Kommentare &
+		Siehe \emph {Ausnahmefälle, Zeitverhalten, Verfügbarkeit} - das müssen wir noch besprechen \\ \hline
+\end{tabular}
+\end{table}
+\\
+\begin{table}[htp]
+\caption{WAVE LVL USE CASE}
+\label{tab:usecase_wave}
+\begin{tabular}{|p{0.3\linewidth}| p{0.7\linewidth} |}
+	\hline 
+	\rowcolor{tabgrey} \textbf{Name} & \textbf{Puck in richtiger Reihenfolge regulär} \\
+	\hline
+
+	Akteur & 
+	\frqq Lichtschranke.inHoehenmessung\flqq, \frqq Lichtschranke.einlauf\flqq, \frqq Lichtschranke.inWeiche\flqq, \frqq weiche.oeffnen\flqq, \frqq Messung.hoehe\flqq, \frqq Messung.metall\flqq und alle sonstigen eigentlich auch \\ \hline
+	Auslösendes Ereignis &
+		Das Ergebnis von \frqq Messung.hoehe\flqq und \frqq Messung.metall\flqq \\ \hline
+	Kurzbeschreibung & 
+		Die Höhenmessung bzw. Metallerkennung ergibt einen Wert, der entsprechend der Reihenfolgeerkennung stimmt (Genauer definieren) \\ \hline
+		
+	Vorbedingungen & 
+		Zustand: \frqq OK\flqq \\ \hline
+	Essentielle Schritte &
+		\begin{tabular}{|p{0.4\linewidth}|p{0.52\linewidth}|}
+		\hline
+			\rowcolor{tabgrey} \textbf{Intention \newline der Systemumgebung} & \textbf{Reaktion des Systems} \\ \hline \rowcolor{white}
+
+			Schritt 1: \frqq Messung.hoehe \flqq und \frqq Messung.metall\flqq ergibt entsprechend der Reihenfolge \emph{richtige Reihenfolge regulär} &
+				Reaktion 1: Typerkennungsausgabe auf Konsole \newline \\ \hline & Reaktion 2: \frqq Weiche.oeffnen\flqq wenn \frqq Lichtschranke.inWeiche\flqq
+				
+		\end{tabular} \\ \hline
+	
+	Ausnahmefälle &
+		Später einfügen, Initial nur Normalverhalten \\ \hline
+	Nachbedingungen & 
+	 	...(\frqq Lichtschranke.auslauf\flqq wird nach Zeit \emph{xz} durch den Puk aktiviert)\\ \hline
+	Zeitverhalten &
+		...(muss hier etwas hin, wegen wenn zu früh oder zu spät?)  \\ \hline
+	Verfügbarkeit & 
+		...(So etwas wie erwartete / notwendige MTBF o.ä.) \\ \hline
+	Fragen/Kommentare &
+		Siehe \emph {Ausnahmefälle, Zeitverhalten, Verfügbarkeit} - das müssen wir noch besprechen \\ \hline
+\end{tabular}
+\newline
+\newline
+\end{table}
+
+\begin{table}[htp]
+\caption{WAVE LVL USE CASE}
+\label{tab:usecase_wave}
+\begin{tabular}{|p{0.3\linewidth}| p{0.7\linewidth} |}
+	\hline 
+	\rowcolor{tabgrey} \textbf{Name} & \textbf{Puck in falscher Reihenfolge regulär} \\
+	\hline
+
+	Akteur & 
+	\frqq Lichtschranke.inHoehenmessung\flqq, \frqq Lichtschranke.einlauf\flqq, \frqq Messung.hoehe\flqq, \frqq Messung.metall\flqq und alle sonstigen eigentlich auch \\ \hline
+	Auslösendes Ereignis &
+		Das Ergebnis von \frqq Messung.hoehe\flqq und \frqq Messung.metall\flqq \\ \hline
+	Kurzbeschreibung & 
+		Die Hoehenmessung bzw. Metallerkennung ergibt einen Wert, der entsprechend der Reihenfolgeerkennung \emph{nicht} stimmt \\ \hline
+		
+	Vorbedingungen & 
+		\frqq Lichtschranke.rutscheVoll\flqq frei \\ \hline
+	Essentielle Schritte &
+		\begin{tabular}{|p{0.4\linewidth}|p{0.52\linewidth}|}
+		\hline
+			\rowcolor{tabgrey} \textbf{Intention \newline der Systemumgebung} & \textbf{Reaktion des Systems} \\ \hline \rowcolor{white}
+
+			Schritt 1: \frqq Messung.hoehe \flqq und \frqq Messung.metall\flqq ergibt entsprechend der Reihenfolge \emph{falsche Reihenfolge regulär} &
+				Reaktion 1: Typerkennungsausgabe auf Konsole \newline \\
+				\hline & Reaktion 2: \frqq Weiche.oeffnen\flqq auf Band2, nachdem der Puk \frqq Lichtschranke.inWeiche\flqq auf Band2 erreicht hat
+				
+		\end{tabular} \\ \hline
+	
+	Ausnahmefälle &
+		Später einfügen, Initial nur Normalverhalten \\ \hline
+	Nachbedingungen & 
+	 	nüscht\\ \hline
+	Zeitverhalten &
+		...(muss hier etwas hin, wegen wenn zu früh oder zu spät?)  \\ \hline
+	Verfügbarkeit & 
+		...(So etwas wie erwartete / notwendige MTBF o.ä.) \\ \hline
+	Fragen/Kommentare &
+		Siehe \emph {Ausnahmefälle, Zeitverhalten, Verfügbarkeit} - das müssen wir noch besprechen \\ \hline
+\end{tabular}
+\newline
+\newline
+\end{table}
+
+\begin{table}[htp]
+\caption{WAVE LVL USE CASE}
+\label{tab:usecase_wave}
+\begin{tabular}{|p{0.3\linewidth}| p{0.7\linewidth} |}
+	\hline 
+	\rowcolor{tabgrey} \textbf{Name} & \textbf{flacher Puk regulär} \\
+	\hline
+
+	Akteur & 
+	\frqq Lichtschranke.inHoehenmessung\flqq, \frqq Lichtschranke.einlauf\flqq, \frqq Messung.hoehe\flqq, \frqq Messung.metall\flqq und alle sonstigen eigentlich auch \\ \hline
+	Auslösendes Ereignis &
+		Das Ergebnis von \frqq Messung.hoehe\flqq  \\ \hline
+	Kurzbeschreibung & 
+		Die Hoehenmessung ergibt einen Wert für einen \emph{flachen Puk} \\ \hline
+		
+	Vorbedingungen & 
+		\frqq Lichtschranke.rutscheVoll\flqq frei UND Puk befindet sich auf nicht auf Band2 \\ \hline
+	Essentielle Schritte &
+		\begin{tabular}{|p{0.4\linewidth}|p{0.52\linewidth}|}
+		\hline
+			\rowcolor{tabgrey} \textbf{Intention \newline der Systemumgebung} & \textbf{Reaktion des Systems} \\ \hline \rowcolor{white}
+
+			Schritt 1: \frqq Messung.hoehe \flqq  ergibt \emph{flacher Puk regulär} &
+				Reaktion 1: \frqq Ampel.gelb \flqq blinkt \newline \\ \hline
+			
+				
+		\end{tabular} \\ \hline
+	
+	Ausnahmefälle &
+		Später einfügen, Initial nur Normalverhalten \\ \hline
+	Nachbedingungen & 
+	 	nüscht \\ \hline
+	Zeitverhalten &
+		...(muss hier etwas hin, wegen wenn zu früh oder zu spät?)  \\ \hline
+	Verfügbarkeit & 
+		...(So etwas wie erwartete / notwendige MTBF o.ä.) \\ \hline
+	Fragen/Kommentare &
+		Siehe \emph {Ausnahmefälle, Zeitverhalten, Verfügbarkeit} - das müssen wir noch besprechen \\ \hline
+\end{tabular}
+\newline
+\newline
+\end{table}
+
+
+
+
+
+\begin{table}[htp]
+\caption{WAVE LVL USE CASE}
+\label{tab:usecase_wave}
+\begin{tabular}{|p{0.3\linewidth}| p{0.7\linewidth} |}
+	\hline 
+	\rowcolor{tabgrey} \textbf{Name} & \textbf{ein Laufband ist leer} \\
+	\hline
+
+	Akteur & 
+	\frqq Lichtschranke.*\flqq \\ \hline
+	Auslösendes Ereignis &
+		Lichtschranken von \emph{Band1} oder \emph{Band2} seit Zeit \emph{xy} nicht ausgelöst  \\ \hline
+	Kurzbeschreibung & 
+		Es ist auf  \emph{Band1} oder \emph{Band2} kein Puks mehr bzw. die Puk-Liste ist leer \\ \hline
+		
+	Vorbedingungen & 
+		Zustand: \frqq OK\flqq \\ \hline
+	Essentielle Schritte &
+		\begin{tabular}{|p{0.4\linewidth}|p{0.52\linewidth}|}
+		\hline
+			\rowcolor{tabgrey} \textbf{Intention \newline der Systemumgebung} & \textbf{Reaktion des Systems} \\ \hline \rowcolor{white}
+
+			Schritt 1: \frqq Lichtschranke.* \flqq von  \emph{Band1} oder \emph{Band2} löst kein Ereignis seit Zeit \emph{xy} aus, \newline führt zu \emph{ein Laufband leer} &
+				Reaktion 1: \flqq Motor.stopp\frqq wird ausgelöst  \newline \\ \hline
+			
+				
+		\end{tabular} \\ \hline
+	
+	Ausnahmefälle &
+		Später einfügen, Initial nur Normalverhalten \\ \hline
+	Nachbedingungen & 
+	 	...\\ \hline
+	Zeitverhalten &
+		...(muss hier etwas hin, wegen wenn zu früh oder zu spät?)  \\ \hline
+	Verfügbarkeit & 
+		...(So etwas wie erwartete / notwendige MTBF o.ä.) \\ \hline
+	Fragen/Kommentare &
+		Siehe \emph {Ausnahmefälle, Zeitverhalten, Verfügbarkeit} - das müssen wir noch besprechen \\ \hline
+\end{tabular}
+\newline
+\newline
+\end{table}
+
+\begin{table}[htp]
+\caption{WAVE LVL USE CASE}
+\label{tab:usecase_wave}
+\begin{tabular}{|p{0.3\linewidth}| p{0.7\linewidth} |}
+	\hline 
+	\rowcolor{tabgrey} \textbf{Name} & \textbf{Puk verschwindet} \\
+	\hline
+
+	Akteur & 
+	\frqq Timer\flqq \\ \hline
+	Auslösendes Ereignis &
+		Timer für einen Puk läuft ab/wird zu früh unterbrochen  \\ \hline
+	Kurzbeschreibung & 
+		Es ist auf  \emph{Band1} oder \emph{Band2} nach der Puk-Liste ist noch ein Puk und dieser erreicht die Lichtschranke zur Timerunterbrechung zu früh oder spät \\ \hline
+		
+	Vorbedingungen & 
+		Zustand: \frqq OK\flqq :/odernix? \\ \hline 
+	Essentielle Schritte &
+		\begin{tabular}{|p{0.4\linewidth}|p{0.52\linewidth}|}
+		\hline
+			\rowcolor{tabgrey} \textbf{Intention \newline der Systemumgebung} & \textbf{Reaktion des Systems} \\ \hline \rowcolor{white}
+
+			Schritt 1: Timer läuft ab/wird zu früh unterbrochen\newline führt zu \emph{Puk verschwindet} &
+				Reaktion 1: \flqq Motor.stopp\frqq wird für  \emph{Band1} und \emph{Band2} ausgelöst  \newline \\ \hline  & 
+				Reaktion 2: Fehlermeldung	\\ \hline
+			
+				
+		\end{tabular} \\ \hline
+	
+	Ausnahmefälle &
+		Später einfügen, Initial nur Normalverhalten \\ \hline
+	Nachbedingungen & 
+	 	...\\ \hline
+	Zeitverhalten &
+		...(muss hier etwas hin, wegen wenn zu früh oder zu spät?)  \\ \hline
+	Verfügbarkeit & 
+		...(So etwas wie erwartete / notwendige MTBF o.ä.) \\ \hline
+	Fragen/Kommentare &
+		Siehe \emph {Ausnahmefälle, Zeitverhalten, Verfügbarkeit} - das müssen wir noch besprechen \\ \hline
+\end{tabular}
+\newline
+\newline
+\end{table}
+
+
+\begin{table}[htp]
+\caption{WAVE LVL USE CASE}
+\label{tab:usecase_wave}
+\begin{tabular}{|p{0.3\linewidth}| p{0.7\linewidth} |}
+	\hline 
+	\rowcolor{tabgrey} \textbf{Name} & \textbf{Puk unregulär hinzugefügt} \\
+	\hline
+
+	Akteur & 
+	\frqq Lichtschranke.inHoehenmessung\flqq, \frqq Lichtschranke.inWeiche \flqq, \frqq Lichtschranke.auslauf \flqq \\ \hline
+	Auslösendes Ereignis &
+		Genannte Lichtschranken von \emph{Band1} oder \emph{Band2} werden ausgelöst  \\ \hline
+	Kurzbeschreibung & 
+		Die genannten Lichtschranken werden ausgelöst, obwohl kein anderes Ereignis es zu dieser Zeit machen sollte \\ \hline
+		
+	Vorbedingungen & 
+		Zustand: \frqq OK\flqq \\ \hline
+	Essentielle Schritte &
+		\begin{tabular}{|p{0.4\linewidth}|p{0.52\linewidth}|}
+		\hline
+			\rowcolor{tabgrey} \textbf{Intention \newline der Systemumgebung} & \textbf{Reaktion des Systems} \\ \hline \rowcolor{white}
+
+			Schritt 1: Die Lichtschranken von  \emph{Band1} oder \emph{Band2} löst ein Ereignis aus, obwohl eigentlich kein Ereignis ansteht, \newline führt zu \emph{Puk unregulär hinzugefügt} &
+				Reaktion 1: \flqq Motor.stopp\frqq wird für  \emph{Band1} und \emph{Band2} ausgelöst  \newline \\ \hline & 
+				Reaktion 2: Fehlermeldung	\\ \hline
+				
+		\end{tabular} \\ \hline
+	
+	Ausnahmefälle &
+		Später einfügen, Initial nur Normalverhalten \\ \hline
+	Nachbedingungen & 
+	 	...\\ \hline
+	Zeitverhalten &
+		...(muss hier etwas hin, wegen wenn zu früh oder zu spät?)  \\ \hline
+	Verfügbarkeit & 
+		...(So etwas wie erwartete / notwendige MTBF o.ä.) \\ \hline
+	Fragen/Kommentare &
+		Siehe \emph {Ausnahmefälle, Zeitverhalten, Verfügbarkeit} - das müssen wir noch besprechen \\ \hline
+\end{tabular}
+\newline
+\newline
+\end{table}
+
+\begin{table}[htp]
+\caption{WAVE LVL USE CASE}
+\label{tab:usecase_wave}
+\begin{tabular}{|p{0.3\linewidth}| p{0.7\linewidth} |}
+	\hline 
+	\rowcolor{tabgrey} \textbf{Name} & \textbf{beide Rutschen sind voll} \\
+	\hline
+
+	Akteur & 
+	\frqq Lichtschranke.rutscheVoll\flqq beider Bänder \\ \hline
+	Auslösendes Ereignis &
+		Genannte Lichtschranken von \emph{Band1} oder \emph{Band2} werden ausgelöst  \\ \hline
+	Kurzbeschreibung & 
+		Die genannten Lichtschranken werden ausgelöst und die Laufbänder stoppen \\ \hline
+		
+	Vorbedingungen & 
+		Zustand: \frqq OK\flqq :/oderwieoderwat?\\ \hline
+	Essentielle Schritte &
+		\begin{tabular}{|p{0.4\linewidth}|p{0.52\linewidth}|}
+		\hline
+			\rowcolor{tabgrey} \textbf{Intention \newline der Systemumgebung} & \textbf{Reaktion des Systems} \\ \hline \rowcolor{white}
+
+			Schritt 1: \flqq Lichtschranke.rutscheVoll \frqq von  \emph{Band1} oder \emph{Band2} löst ein Ereignis aus \newline führt zu \emph{beide Rutschen voll} &
+				Reaktion 1: \flqq Motor.stopp\frqq wird für  \emph{Band1} und \emph{Band2} ausgelöst  \newline \\ \hline & 
+				Reaktion 2: Fehlermeldung			
+				
+		\end{tabular} \\ \hline
+	
+	Ausnahmefälle &
+		Später einfügen, Initial nur Normalverhalten \\ \hline
+	Nachbedingungen & 
+	 	...\\ \hline
+	Zeitverhalten &
+		...(muss hier etwas hin, wegen wenn zu früh oder zu spät?)  \\ \hline
+	Verfügbarkeit & 
+		...(So etwas wie erwartete / notwendige MTBF o.ä.) \\ \hline
+	Fragen/Kommentare &
+		Siehe \emph {Ausnahmefälle, Zeitverhalten, Verfügbarkeit} - das müssen wir noch besprechen \\ \hline
+\end{tabular}
+\newline
+\newline
+\end{table}
+
+\begin{table}[htp]
+\caption{WAVE LVL USE CASE}
+\label{tab:usecase_wave}
+\begin{tabular}{|p{0.3\linewidth}| p{0.7\linewidth} |}
+	\hline 
+	\rowcolor{tabgrey} \textbf{Name} & \textbf{Aus-Taste gedrückt wenn das Laufband an ist} \\
+	\hline
+
+	Akteur & 
+	\frqq UI.Taste.stop\flqq \\ \hline
+	Auslösendes Ereignis &
+		\frqq UI.Taste.stop\flqq wird durch mechanischen Eingriff ausgelöst \\ \hline
+	Kurzbeschreibung & 
+		Die Stopp-Taste wird gedrückt, während die Laufbänder an sind \\ \hline
+		
+	Vorbedingungen & 
+		Zustand des Motors \flqq motor.rechtslauf\frqq \\ \hline
+	Essentielle Schritte &
+		\begin{tabular}{|p{0.4\linewidth}|p{0.52\linewidth}|}
+		\hline
+			\rowcolor{tabgrey} \textbf{Intention \newline der Systemumgebung} & \textbf{Reaktion des Systems} \\ \hline \rowcolor{white}
+
+			Schritt 1: \frqq UI.Taste.stop\flqq löst ein Ereignis aus \newline führt zu \emph{Aus-Taste gedrückt wenn das Laufband an ist} &
+				Reaktion 1: \flqq Motor.stopp\frqq wird für  \emph{Band1} und \emph{Band2} ausgelöst  \newline \\ \hline & 
+				Reaktion 2: \frqq UI.LED.stop\flqq leuchtet	\\ \hline &
+				Reaktion 3: Zustände werden gespeichert, nur das Band wird gestoppt $\to$ Wiederinbetriebnahme startet Band wieder - alle Funktionen wieder gegeben (CEO muss noch sagen wie das gemacht werden soll)
+				\\ \hline
+						
+				
+		\end{tabular} \\ \hline
+	
+	Ausnahmefälle &
+		Später einfügen, Initial nur Normalverhalten \\ \hline
+	Nachbedingungen & 
+	 	\frqq UI.LED.stop\flqq leuchtet \\ \hline
+	Zeitverhalten &
+		...(muss hier etwas hin, wegen wenn zu früh oder zu spät?)  \\ \hline
+	Verfügbarkeit & 
+		...(So etwas wie erwartete / notwendige MTBF o.ä.) \\ \hline
+	Fragen/Kommentare &
+		Siehe \emph {Ausnahmefälle, Zeitverhalten, Verfügbarkeit} - das müssen wir noch besprechen \\ \hline
+\end{tabular}
+\newline
+\newline
+\end{table}
+
+
+\begin{table}[htp]
+\caption{WAVE LVL USE CASE}
+\label{tab:usecase_wave}
+\begin{tabular}{|p{0.3\linewidth}| p{0.7\linewidth} |}
+	\hline 
+	\rowcolor{tabgrey} \textbf{Name} & \textbf{Ein-Taste gedrückt wenn das Laufband aus ist} \\
+	\hline
+
+	Akteur & 
+	\frqq UI.Taste.start\flqq \\ \hline
+	Auslösendes Ereignis &
+		\frqq UI.Taste.start\flqq werden durch mechanischen Eingriff ausgelöst \\ \hline
+	Kurzbeschreibung & 
+		Die Start-Taste wird gedrückt, Starten, Testlauf zur Kalibrierung startet... \\ \hline
+		
+	Vorbedingungen & 
+		Wenn Zustand des Motors \flqq motor.stopp\frqq \\ \hline
+	Essentielle Schritte &
+		\begin{tabular}{|p{0.4\linewidth}|p{0.52\linewidth}|}
+		\hline
+			\rowcolor{tabgrey} \textbf{Intention \newline der Systemumgebung} & \textbf{Reaktion des Systems} \\ \hline \rowcolor{white}
+
+			Schritt 1: \frqq UI.Taste.start\flqq löst ein Ereignis aus \newline führt zu \emph{Ein-Taste gedrückt wenn das Laufband aus ist} &
+				Reaktion 1: \flqq Motor.rechtslauf\frqq wird für  \emph{Band1} und \emph{Band2} ausgelöst  \newline \\ \hline & 
+				Reaktion 2: \frqq UI.LED.start\flqq Leuchtet \\ \hline 
+				
+		\end{tabular} \\ \hline
+	
+	Ausnahmefälle &
+		Später einfügen, Initial nur Normalverhalten \\ \hline
+	Nachbedingungen & 
+	 	\frqq UI.LED.start\flqq leuchtet \\ \hline\\ \hline
+	Zeitverhalten &
+		...(muss hier etwas hin, wegen wenn zu früh oder zu spät?)  \\ \hline
+	Verfügbarkeit & 
+		...(So etwas wie erwartete / notwendige MTBF o.ä.) \\ \hline
+	Fragen/Kommentare &
+		Siehe \emph {Ausnahmefälle, Zeitverhalten, Verfügbarkeit} - das müssen wir noch besprechen \\ \hline
+\end{tabular}
+\newline
+\newline
+\end{table}
+
+
+\begin{table}[htp]
+\caption{WAVE LVL USE CASE}
+\label{tab:usecase_wave}
+\begin{tabular}{|p{0.3\linewidth}| p{0.7\linewidth} |}
+	\hline 
+	\rowcolor{tabgrey} \textbf{Name} & \textbf{Reset Taste wird gedrückt wenn das Laufband an ist} \\
+	\hline
+
+	Akteur & 
+	\frqq UI.Taste.reset\flqq \\ \hline
+	Auslösendes Ereignis &
+		\frqq UI.Taste.reset\flqq wird durch mechanischen Eingriff ausgelöst \\ \hline
+	Kurzbeschreibung & 
+		Die Reset-Taste wird gedrückt \\ \hline
+		
+	Vorbedingungen & 
+		Wenn Zustand des Motors \emph{nicht} \flqq motor.stopp\frqq :/ODERWIEoderwas?\\ \hline
+	Essentielle Schritte &
+		\begin{tabular}{|p{0.4\linewidth}|p{0.52\linewidth}|}
+		\hline
+			\rowcolor{tabgrey} \textbf{Intention \newline der Systemumgebung} & \textbf{Reaktion des Systems} \\ \hline \rowcolor{white}
+
+			Schritt 1: \frqq UI.Taste.reset\flqq löst ein Ereignis aus \newline führt zu \emph{Reset Taste wird gedrückt wenn das Laufband an ist} &
+				Reaktion 1: \frqq UI.LED.reset\flqq Leuchten	\newline \\ \hline 	
+				
+		\end{tabular} \\ \hline
+	
+	Ausnahmefälle &
+		Später einfügen, Initial nur Normalverhalten \\ \hline
+	Nachbedingungen & 
+	 	...\\ \hline
+	Zeitverhalten &
+		...(muss hier etwas hin, wegen wenn zu früh oder zu spät?)  \\ \hline
+	Verfügbarkeit & 
+		...(So etwas wie erwartete / notwendige MTBF o.ä.) \\ \hline
+	Fragen/Kommentare &
+		Siehe \emph {Ausnahmefälle, Zeitverhalten, Verfügbarkeit} - das müssen wir noch besprechen \\ \hline
+\end{tabular}
+\newline
+\newline
+\end{table}
+
+\begin{table}[htp]
+\caption{WAVE LVL USE CASE}
+\label{tab:usecase_wave}
+\begin{tabular}{|p{0.3\linewidth}| p{0.7\linewidth} |}
+	\hline 
+	\rowcolor{tabgrey} \textbf{Name} & \textbf{Reset Taste wird gedrückt wenn das Laufband aus ist} \\
+	\hline
+
+	Akteur & 
+	\frqq UI.Taste.reset\flqq \\ \hline
+	Auslösendes Ereignis &
+		\frqq UI.Taste.reset\flqq wird durch mechanischen Eingriff ausgelöst \\ \hline
+	Kurzbeschreibung & 
+		Die Reset-Taste wird gedrückt \\ \hline
+		
+	Vorbedingungen & 
+		Wenn Zustand des Motors: \frqq motor.stopp \flqq :/mussdatso?\\ \hline
+	Essentielle Schritte &
+		\begin{tabular}{|p{0.4\linewidth}|p{0.52\linewidth}|}
+		\hline
+			\rowcolor{tabgrey} \textbf{Intention \newline der Systemumgebung} & \textbf{Reaktion des Systems} \\ \hline \rowcolor{white}
+
+			Schritt 1: \frqq UI.Taste.reset\flqq löst ein Ereignis aus \newline führt zu \emph{Reset Taste wird gedrückt wenn das Laufband aus ist} &
+				Reaktion 1: \frqq UI.LED.reset\flqq Leuchtet	\newline \\ \hline 	& Reaktion 2: Fehler quittiert $\to$ normaler Betrieb 
+				
+		\end{tabular} \\ \hline
+	
+	Ausnahmefälle &
+		Später einfügen, Initial nur Normalverhalten \\ \hline
+	Nachbedingungen & 
+	 	...\\ \hline
+	Zeitverhalten &
+		...(muss hier etwas hin, wegen wenn zu früh oder zu spät?)  \\ \hline
+	Verfügbarkeit & 
+		...(So etwas wie erwartete / notwendige MTBF o.ä.) \\ \hline
+	Fragen/Kommentare &
+		Siehe \emph {Ausnahmefälle, Zeitverhalten, Verfügbarkeit} - das müssen wir noch besprechen \\ \hline
+\end{tabular}
+\newline
+\newline
+\end{table}
+
+\begin{table}[htp]
+\caption{WAVE LVL USE CASE}
+\label{tab:usecase_wave}
+\begin{tabular}{|p{0.3\linewidth}| p{0.7\linewidth} |}
+	\hline 
+	\rowcolor{tabgrey} \textbf{Name} & \textbf{E-Stopp Taste wird gedrückt wenn das Laufband an ist} \\
+	\hline
+
+	Akteur & 
+	\frqq UI.Taste.eStop\flqq \\ \hline
+	Auslösendes Ereignis &
+		\frqq UI.Taste.eStop\flqq wird durch mechanischen Eingriff ausgelöst \\ \hline
+	Kurzbeschreibung & 
+		Die E-Stopp - Taste wird gedrückt, was tun?... \\ \hline
+		
+	Vorbedingungen & 
+		... \\ \hline
+	Essentielle Schritte &
+		\begin{tabular}{|p{0.4\linewidth}|p{0.52\linewidth}|}
+		\hline
+			\rowcolor{tabgrey} \textbf{Intention \newline der Systemumgebung} & \textbf{Reaktion des Systems} \\ \hline \rowcolor{white}
+
+			Schritt 1: \frqq UI.Taste.eStopp\flqq löst ein Ereignis aus \newline führt zu \emph{E-Stopp Taste wird gedrückt wenn das Laufband an ist} &
+				Reaktion 1: Laufband-Motor stoppen, Lampen aus?	\newline \\ \hline 	
+				
+		\end{tabular} \\ \hline
+	
+	Ausnahmefälle &
+		Später einfügen, Initial nur Normalverhalten \\ \hline
+	Nachbedingungen & 
+	 	...\\ \hline
+	Zeitverhalten &
+		...(muss hier etwas hin, wegen wenn zu früh oder zu spät?)  \\ \hline
+	Verfügbarkeit & 
+		...(So etwas wie erwartete / notwendige MTBF o.ä.) \\ \hline
+	Fragen/Kommentare &
+		Siehe \emph {Ausnahmefälle, Zeitverhalten, Verfügbarkeit} - das müssen wir noch besprechen \\ \hline
+\end{tabular}
+\newline
+\newline
+\end{table}
+
+
+\begin{table}[h]
+\caption{WAVE LVL USE CASE}
+\label{tab:usecase_wave}
+\begin{tabular}{|p{0.3\linewidth}| p{0.7\linewidth} |}
+	\hline 
+	\rowcolor{tabgrey} \textbf{Name} & \textbf{E-Stopp Taste wird gedrückt wenn das Laufband aus ist} \\
+	\hline
+
+	Akteur & 
+	\frqq UI.Taste.eStop\flqq \\ \hline
+	Auslösendes Ereignis &
+		\frqq UI.Taste.eStop\flqq wird durch mechanischen Eingriff ausgelöst \\ \hline
+	Kurzbeschreibung & 
+		Die E-Stopp - Taste wird gedrückt, was tun?... \\ \hline
+		
+	Vorbedingungen & 
+		Wenn Zustand des Motors: \frqq motor.stopp \flqq \\ \hline
+	Essentielle Schritte &
+		\begin{tabular}{|p{0.4\linewidth}|p{0.52\linewidth}|}
+		\hline
+			\rowcolor{tabgrey} \textbf{Intention \newline der Systemumgebung} & \textbf{Reaktion des Systems} \\ \hline \rowcolor{white}
+
+			Schritt 1: \frqq UI.Taste.eStopp\flqq löst ein Ereignis aus \newline führt zu \emph{E-Stopp Taste wird gedrückt wenn das Laufband aus ist} &
+				Reaktion 1: Lampen aus, was noch? Wiederinbetriebnahme mit Reset-quittierung?	\newline \\ \hline 	
+				
+		\end{tabular} \\ \hline
+	
+	Ausnahmefälle &
+		Später einfügen, Initial nur Normalverhalten \\ \hline
+	Nachbedingungen & 
+	 	...\\ \hline
+	Zeitverhalten &
+		...(muss hier etwas hin, wegen wenn zu früh oder zu spät?)  \\ \hline
+	Verfügbarkeit & 
+		...(So etwas wie erwartete / notwendige MTBF o.ä.) \\ \hline
+	Fragen/Kommentare &
+		Siehe \emph {Ausnahmefälle, Zeitverhalten, Verfügbarkeit} - das müssen wir noch besprechen \\ \hline
+\end{tabular}
+\newline
+\newline
+\end{table}
+
+
+\begin{table}[htp]
+\caption{WAVE LVL USE CASE}
+\label{tab:usecase_wave}
+\begin{tabular}{|p{0.3\linewidth}| p{0.7\linewidth} |}
+	\hline 
+	\rowcolor{tabgrey} \textbf{Name} & \textbf{Reset Taste wird gedrückt wenn das Laufband durch E-Stopp gestoppt wurde} \\
+	\hline
+
+	Akteur & 
+	\frqq UI.Taste.reset\flqq \\ \hline
+	Auslösendes Ereignis &
+		\frqq UI.Taste.reset\flqq wird durch mechanischen Eingriff ausgelöst \\ \hline
+	Kurzbeschreibung & 
+		Die Reset-Taste wird gedrückt \\ \hline
+		
+	Vorbedingungen & 
+		Wenn Zustand des Motors: \frqq motor.stopp \flqq, oder wat??? \\ \hline
+	Essentielle Schritte &
+		\begin{tabular}{|p{0.4\linewidth}|p{0.52\linewidth}|}
+		\hline
+			\rowcolor{tabgrey} \textbf{Intention \newline der Systemumgebung} & \textbf{Reaktion des Systems} \\ \hline \rowcolor{white}
+
+			Schritt 1: \frqq UI.Taste.reset\flqq löst ein Ereignis aus \newline führt zu \emph{Reset Taste wird gedrückt wenn das Laufband durch E-Stopp gestoppt wurde} &
+				Reaktion 1:  \frqq motor.rechtslauf\flqq 	\newline \\ \hline 	& Reaktion 2:  \frqq Ampel.gruen\flqq \newline \\ \hline 	
+				& Reaktion 3:  \frqq UI.LED.start\flqq \newline \\ \hline 	
+				& Reaktion 4:  Startroutine beginnt halt
+				
+		\end{tabular} \\ \hline
+	
+	Ausnahmefälle &
+		Später einfügen, Initial nur Normalverhalten \\ \hline
+	Nachbedingungen & 
+	 	...\\ \hline
+	Zeitverhalten &
+		...(muss hier etwas hin, wegen wenn zu früh oder zu spät?)  \\ \hline
+	Verfügbarkeit & 
+		...(So etwas wie erwartete / notwendige MTBF o.ä.) \\ \hline
+	Fragen/Kommentare &
+		Siehe \emph {Ausnahmefälle, Zeitverhalten, Verfügbarkeit} - das müssen wir noch besprechen \newline Nils ist schuld \\ \hline
+\end{tabular}
+\newline
+\newline
+\end{table}
+
+\end{document}
+% vim: set spell spelllang=de :EOF

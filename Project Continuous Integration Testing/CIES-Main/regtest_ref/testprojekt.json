@@ -1,0 +1,186 @@
+{
+	"files":[{
+			"file_name":"Data.h",
+			"err_ids":[{
+					"errid":"0",
+					"line":"14",
+					"row":"18",
+					"decription":"use of undeclared identifier 'std' ;;; bool setData(stdstring str); ;;; ^",
+					"type":"error"
+				},
+				{
+					"errid":"1",
+					"line":"15",
+					"row":"5",
+					"decription":"use of undeclared identifier 'std' ;;; stdstring getData(); ;;; ^",
+					"type":"error"
+				},
+				{
+					"errid":"2",
+					"line":"18",
+					"row":"5",
+					"decription":"use of undeclared identifier 'std' ;;; stdstring str; ;;; ^",
+					"type":"error"
+				},
+				{
+					"errid":"3",
+					"line":"14",
+					"row":"18",
+					"decription":"use of undeclared identifier 'std' ;;; bool setData(stdstring str); ;;; ^",
+					"type":"error"
+				},
+				{
+					"errid":"4",
+					"line":"15",
+					"row":"5",
+					"decription":"use of undeclared identifier 'std' ;;; stdstring getData(); ;;; ^",
+					"type":"error"
+				},
+				{
+					"errid":"5",
+					"line":"18",
+					"row":"5",
+					"decription":"use of undeclared identifier 'std' ;;; stdstring str; ;;; ^",
+					"type":"error"
+				}
+			]
+		},
+		{
+			"file_name":"main.cpp",
+			"err_ids":[{
+					"errid":"6",
+					"line":"11",
+					"row":"5",
+					"decription":"Assigned value is garbage or undefined ;;; int i= *iPtr; ;;; ^~~~~  ~~~~~",
+					"type":"warning"
+				}
+			]
+		},
+		{
+			"file_name":"Manager.cpp",
+			"err_ids":[{
+					"errid":"7",
+					"line":"15",
+					"row":"9",
+					"decription":"Value stored to 'i' during its initialization is never read ;;; int i=d/ZERO; ;;; ^ ~~~~~~",
+					"type":"warning"
+				},
+				{
+					"errid":"8",
+					"line":"23",
+					"row":"9",
+					"decription":"Value stored to 'c' is never read ;;; c=3; ;;; ^ ~",
+					"type":"warning"
+				},
+				{
+					"errid":"9",
+					"line":"29",
+					"row":"9",
+					"decription":"Value stored to 'c' is never read ;;; c=-3; ;;; ^ ~~",
+					"type":"warning"
+				},
+				{
+					"errid":"10",
+					"line":"41",
+					"row":"5",
+					"decription":"String copy function overflows destination buffer ;;; stdstrcpy(buf,name); ;;; ^~~~~~~~~~~~~~~~~~~~~",
+					"type":"warning"
+				},
+				{
+					"errid":"11",
+					"line":"55",
+					"row":"10",
+					"decription":"Value stored to 'c' during its initialization is never read ;;; char c = buf[a]; ;;; ^   ~~~~~~",
+					"type":"warning"
+				},
+				{
+					"errid":"12",
+					"line":"64",
+					"row":"9",
+					"decription":"Value stored to 'x' during its initialization is never read ;;; int x = p[0]; ;;; ^   ~~~~",
+					"type":"warning"
+				},
+				{
+					"errid":"13",
+					"line":"64",
+					"row":"13",
+					"decription":"Array access (from variable 'p') results in a null pointer dereference ;;; int x = p[0]; ;;; ^~~~",
+					"type":"warning"
+				},
+				{
+					"errid":"14",
+					"line":"73",
+					"row":"12",
+					"decription":"Assigned value is garbage or undefined ;;; max=hilf; ;;; ^~~~~",
+					"type":"warning"
+				},
+				{
+					"errid":"15",
+					"line":"75",
+					"row":"9",
+					"decription":"Value stored to 'hilf' is never read ;;; hilf=min; ;;; ^    ~~~",
+					"type":"warning"
+				},
+				{
+					"errid":"16",
+					"line":"22",
+					"row":"9",
+					"decription":"using the result of an assignment as a condition without parentheses [-Wparentheses] ;;; if(a=b){ ;;; ~^~",
+					"type":"warning"
+				},
+				{
+					"errid":"17",
+					"line":"22",
+					"row":"9",
+					"decription":"place parentheses around the assignment to silence this warning ;;; if(a=b){ ;;; ^ ;;; (  )",
+					"type":"note"
+				},
+				{
+					"errid":"18",
+					"line":"22",
+					"row":"9",
+					"decription":"use '==' to turn this assignment into an equality comparison ;;; if(a=b){ ;;; ^ ;;; ==",
+					"type":"note"
+				},
+				{
+					"errid":"19",
+					"line":"27",
+					"row":"13",
+					"decription":"if statement has empty body [-Wempty-body] ;;; if(a==b); ;;; ^",
+					"type":"warning"
+				},
+				{
+					"errid":"20",
+					"line":"27",
+					"row":"13",
+					"decription":"put the semicolon on a separate line to silence this warning",
+					"type":"note"
+				},
+				{
+					"errid":"21",
+					"line":"33",
+					"row":"14",
+					"decription":"implicit conversion from 'double' to 'int' changes value from 3.14 to 3 [-Wliteral-conversion] ;;; int pi = 3.14; //int pi = {3.14}; ;;; ~~   ^~~~",
+					"type":"warning"
+				},
+				{
+					"errid":"22",
+					"line":"82",
+					"row":"1",
+					"decription":"control reaches end of non-void function [-Wreturn-type] ;;; } ;;; ^",
+					"type":"warning"
+				}
+			]
+		},
+		{
+			"file_name":"statistics",
+			"err_ids":[{
+			]
+		}
+	],
+	"stats":{
+		"numberOfLines":"719",
+		"numberOfErrors":"6",
+		"numberOfWarnings":"14"
+	}
+}

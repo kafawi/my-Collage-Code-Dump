@@ -1,0 +1,9 @@
+# password protect single file
+<IfModule mod_auth.c>
+ <Files "anmeldung.php">
+  AuthName "Enter Username "Register" and the password"
+  AuthUserFile ./.htpasswd
+  Require valid-user
+  AuthType Basic
+ </Files>
+</IfModule>

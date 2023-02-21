@@ -1,0 +1,43 @@
+# tmp
+.*~
+*~
+
+## latex
+*.aux
+*.log
+*.toc
+
+*.lof
+*.lot
+*.lol
+
+*.out
+*.ps
+*.dvi
+
+_minted*
+*_latexmk  
+*.fls
+
+*.pdf
+
+# archiv
+*.tar.gz
+
+# cfiles
+*.o
+
+*.gch
+
+# executive file
+mmanage
+vmappl
+# data files
+*.bin
+logfile.txt
+fifo.txt
+clock.txt
+lru.txt
+.depend
+# Not the task pdf
+!bsp3.pdf

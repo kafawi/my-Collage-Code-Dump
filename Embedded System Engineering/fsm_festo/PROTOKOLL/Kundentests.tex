@@ -1,0 +1,131 @@
+% PROTOKOLL Action Item
+\documentclass[
+   draft=false
+  ,paper=a4
+  ,twoside=false
+  ,fontsize=11pt
+  ,headsepline
+  ,DIV11
+  ,parskip=full+
+]{scrartcl} % copied from Thesis Template from HAW
+
+\usepackage[ngerman,english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage[
+    left  =4em
+   ,right =4em
+   ,top   =5em
+   ,bottom=5em
+]{geometry}
+
+\usepackage{longtable}
+            \usepackage[german,refpage]{nomencl}
+
+\usepackage{float}
+\usepackage{enumitem}
+\usepackage{hyperref} % for a better experience
+
+\hypersetup{
+   colorlinks=true % if false - links get colored frames
+  ,linkcolor=black % color of tex intern links
+  ,urlcolor=blue   % color of url links
+}
+
+\usepackage{amsmath}
+
+\usepackage{array}   % for \newcolumntype macro
+\newcolumntype{L}{>{$}l<{$}} % math-mode version of "l" column type
+\newcolumntype{R}{>{$}r<{$}} % math-mode version of "r" column type
+\newcolumntype{C}{>{$}c<{$}} % math-mode version of "c" column type
+
+\usepackage{listing}
+\usepackage{caption}
+\usepackage{colortbl}
+\definecolor{tabgrey}{rgb}{0.85,0.85,0.85}
+%using minted because of the hashtag in bash
+
+\sloppy
+\clubpenalty=10000
+\widowpenalty=10000
+\displaywidowpenalty=10000
+
+\begin{document}
+%\texttt {Dieses Dokument ist vorerst Abgeschlossen. Es werden eventuell Änderungen benötigt.}
+\selectlanguage{ngerman}
+
+
+\newlength{\txtw} %definiere neue länge
+\setlength{\txtw}{\textwidth} %setze neue länge auf textbreite
+\addtolength{\txtw}{-10\tabcolsep} %subtrahiere -8\cdot textbreite von asdf
+
+
+\def\tablehead{
+	\hline 
+	\rowcolor{tabgrey}
+	\textbf{Ziel des Funktionstest} & 
+	\textbf{Durchführung} &
+	\textbf{Beobachtung} 
+ \\
+	\hline 
+	\endhead}
+
+\vspace{-1em}
+\begin{longtable}{
+	|p{0.30\txtw} % Nr.
+	|p{0.30\txtw} % Art
+	|p{0.30\txtw} % Art
+|}
+	\tablehead
+
+	Puck mit Bohrung nach unten erkennen & Legen Sie ein Puck mit Bohrung nach unten auf den Anfang von Band1. & die Typerkennung wird auf der Konsole ausgegeben und der Puck wird auf Band1 oder Band2 aussortiert
+	\\ \hline
+	
+	Pucks in richtiger Reihenfolge erkennen & Legen Sie mehrere Pucks, mit einem erlaubten Abstand, in gewünschter Reihenfolge, am Anfang, auf das Band1 & die Typerkennung wird auf der Konsole ausgegeben und die Pucks die der gewünschten Reihenfolge entsprechen durchlaufen das Band2 bis zum Ende und auf der Konsole werden ID, Typ, Höhen- Messwert von Band1 und von Band2 ausgegeben
+	\\ \hline
+
+	Pucks in falscher Reihenfolge erkennen & Legen Sie mehrere Pucks mit einem erlaubten Abstand, in nicht gewünschter Reihenfolge, am Anfang, auf das Band1. & die Typerkennung wird auf der Konsole ausgegeben und die Pucks die nicht der gewünschten Reihenfolge entsprechen werden auf Band2 aussortiert, nur Pucks welche der gewünschten Reihenfolge entsprechen durchlaufen das Band2 bis zum Ende 
+	\\ \hline
+	
+	flachen Puck erkennen & Legen Sie einen flachen Puck, am Anfang, auf Band1. & die gelbe Lampe blinkt und der flache Puck wird auf Band1 aussortiert
+	\\ \hline 
+    
+    beide Laufbänder sind leer & Legen Sie keinen Puck auf Band1, sodass sich auf einem band kein Puck befindet. & grüne Lampe geht an und alle leeren Laufbänder stehen still
+	\\ \hline 
+	
+	Puck verschwindet & Entfernen Sie einen Puck vom Laufband & beide Laufbänder stoppen und eine Fehlermeldung wird ausgegeben  
+	\\ \hline 
+
+	Puck irregulär hinzugefügt & Legen Sie einen Puck nicht wie gewünscht, am Anfang von Band1 ein, sondern an einem andern Punkt des Laufbandes & beide Laufbänder stoppen und eine Fehlermeldung wird ausgegeben  
+	\\ \hline 
+	
+	beide Rutschen sind voll & Legen Sie so viele Pucks ein, dass beide Rutschen voll sind und dadurch kein Platz ist ein weiteren Puck auszusortieren & beide Laufbänder stoppen und eine Fehlermeldung wird ausgegeben  
+	\\ \hline  
+	
+	Laufband einschalten & Betätigen Sie die Ein Taste, wenn das Laufband aus ist  & die Anlage schaltet sich ein, der Testlauf startet und die LED für die Ein Taste wird eingeschaltet
+	\\ \hline 
+	
+	Laufband- Stopp & Betätigen Sie die Stopp Taste, wenn das Laufband an ist  & Laufband Stoppt
+	\\ \hline 
+	
+	Fehler Quittierung &  Betätigen Sie die Reset Taste, wenn das Laufband an ist und einen Fehler meldet, um den Fehler zu Quittieren & Laufband wird neu gestartet
+	\\ \hline 
+
+   Neustart nach E-Stopp & Betätigen Sie die Reset Taste um das Laufband nach einem E-Stopp gestoppt wurde und der E-Stopp-  Schalter wieder zurückgestellt wurde & Laufband läuft wieder los und die grüne Lampe wird wieder eingeschaltet und die LED für die Ein/ Aus Taste wird eingeschaltet
+	
+\end{longtable}
+
+\vspace{-2.5em}
+\footnotesize
+
+\normalsize
+
+\flushleft
+
+\end{document}
+% vim: set spell spelllang=de :EOF
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\grid

@@ -1,0 +1,153 @@
+9
+0
+1
+(data->isReceivingEnd)
+0
+0
+1
+if band1
+0
+9
+1
+if sequence is okay
+1
+(processedPuk->getType() == seq[index])
+0
+0
+0
+0
+1
+0
+1
+cout << "sequence ok => update sequence" << endl;
+1
+0
+1
+index = (index + 1) % SEQ_SIZE;
+4
+0
+1
+true
+11
+1
+0
+1
+cout << "wrong sequence" << endl;
+9
+1
+if ramp2 obstructed
+1
+(data->rampObstructed == true)
+0
+0
+0
+0
+1
+0
+1
+cout << "Ramp is obstructed" << endl;
+11
+11
+4
+0
+1
+false
+11
+11
+9
+1
+ if ramp1 obstructed and rump2 is NOT obstructed
+1
+(data->rampObstructed == true && data->otherRampObstructed == false)
+0
+0
+1
+ if ramp2 is obstructed
+0
+1
+0
+2
+cout << "Puk is on the way to band2, because ramp1 is blocked"
+                 << endl;
+4
+0
+1
+true
+11
+9
+0
+1
+(data->otherRampObstructed == true)
+0
+0
+2
+ if both ramps are NOT obstructed
+sort out drilled, drilled metal and type 2 / 4 at band2
+0
+1
+0
+1
+cout << "Ramp2 is obstructed, sort out TYPE_2 and TYPE_4 at Band1 " << endl;
+9
+1
+if type is drilled or drilled metal sort out at band 2
+1
+(processedPuk->getType() == TYPE_DRILLED || processedPuk->getType() == TYPE_DRILLED_METAL)
+0
+0
+1
+else sort out at band1
+0
+1
+0
+1
+cout << "Puk is on the way to band2" << endl;
+4
+0
+1
+true
+11
+1
+0
+1
+cout << "sort out the puk at band1" << endl;
+4
+0
+1
+false
+11
+11
+9
+0
+4
+(processedPuk->getType() == TYPE_DRILLED
+                 || processedPuk->getType() == TYPE_DRILLED_METAL
+                 || processedPuk->getType() == TYPE_2
+                 || processedPuk->getType() == TYPE_4)
+0
+0
+1
+ sort out other puks at band1
+0
+1
+0
+1
+cout << "Puk is on the way to band2" << endl;
+4
+0
+1
+true
+11
+1
+0
+1
+cout << "sort out the puk at band1" << endl;
+4
+0
+1
+false
+11
+11
+11
+11
+11

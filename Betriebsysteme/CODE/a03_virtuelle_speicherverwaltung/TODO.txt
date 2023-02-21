@@ -1,0 +1,27 @@
+#
+#  TODO
+#######
+# DOC
+
++ writing entwurf.tex
+
+########
+# SRC
+
++ understand the code!
+
++ Makefile
+  - depend
+ (-)Objects goes into a new dir OBJ
+
+
++ mmanage
+  - signalhandler 
+  - inits and delete functions for objects
+    > shared memory with vmem struct
+    > pagefile.bin
+  - algo choose with getopt   
+  - virtualaddress stuff
+  - ...
+
++ ...

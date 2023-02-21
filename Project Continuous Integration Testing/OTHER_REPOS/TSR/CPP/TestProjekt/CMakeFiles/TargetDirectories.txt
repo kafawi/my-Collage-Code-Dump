@@ -1,0 +1,3 @@
+/home/lennart/Schreibtisch/TeSSA/TestProjekt/CMakeFiles/rebuild_cache.dir
+/home/lennart/Schreibtisch/TeSSA/TestProjekt/CMakeFiles/edit_cache.dir
+/home/lennart/Schreibtisch/TeSSA/TestProjekt/CMakeFiles/TeSSA.dir

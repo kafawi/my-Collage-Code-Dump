@@ -1,0 +1,431 @@
+\documentclass[
+   draft=false
+  ,paper=a4
+  ,twoside=false
+  ,fontsize=11pt
+  ,headsepline
+  ,BCOR10mm
+  ,DIV11
+  ,parskip=full+
+]{scrartcl} % copied from Thesis Template from HAW
+
+\usepackage[ngerman,english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage[german,refpage]{nomencl}
+
+\usepackage{float}
+\usepackage{enumitem}
+\usepackage{hyperref} % for a better experience
+
+\hypersetup{
+   colorlinks=true % if false - links get colored frames
+  ,linkcolor=black % color of tex intern links
+  ,urlcolor=blue   % color of url links
+}
+
+\usepackage{array}   % for \newcolumntype macro
+\newcolumntype{L}{>{$}l<{$}} % math-mode version of "l" column type
+\newcolumntype{R}{>{$}r<{$}} % math-mode version of "r" column type
+\newcolumntype{C}{>{$}c<{$}} % math-mode version of "c" column type
+
+%\usepackage{listing}
+\usepackage{caption}
+%\usepackage{xcolor}
+%\definecolor{bg}{rgb}{0.60,0.95,0.95}
+%using minted because of the hashtag in bash
+\usepackage{minted}
+% c listing
+\newminted{c}{fontsize=\small
+             ,fontfamily=tt
+             ,linenos
+             ,frame=single
+             } % \begin{ccode} ... \end{ccode}
+\newmintedfile{c}{fontsize=\small
+                 ,fontfamily=tt
+                 ,linenos
+                 ,frame=single
+                 ,autogobble
+                 } % \cfile{}
+% Makefile listing
+\newminted{make}{fontsize=\small
+             ,fontfamily=tt
+             ,linenos
+             ,frame=single
+             }  % \begin{makecode} ... \end{makecode}
+\newmintedfile{make}{fontsize=\small
+                    ,fontfamily=tt
+                    ,linenos
+                    ,frame=single
+                    ,autogobble
+                    } % \makefile{}
+\sloppy
+\clubpenalty=10000
+\widowpenalty=10000
+\displaywidowpenalty=10000
+
+\begin{document}
+
+\selectlanguage{ngerman}
+\usemintedstyle{emacs}
+% ----------------------------------------------------------------------------
+% Titel (erst nach \begin{document}, damit babel bereits voll aktiv ist:
+\titlehead{Betriebsystene WS 2016 Praktikum 02}% optional
+\subject{BS Praktikumsaufgabe 02}
+\title{Thread Koordination: Die trainierenden PhilosophInnen}
+\subtitle{Version 0.1 - Abgabe am 7. November 2016 16:00}
+\author{Alexander Mendel \\ Karl-Fabian Witte}
+\date{erstellt am \today}% sinnvoll
+%\publishers{Platz für Betreuer o.\,ä.}% optional
+% ----------------------------------------------------------------------------
+\maketitle% verwendet die zuvor gemachte Angaben zur Gestaltung eines Titels
+\begin{abstract}
+  Zu Anfang wird ein Makefile zu einem gegebenen C-Datei
+  erstellt und somit das Grundprinzip von (GNU)make gelernt.
+  In der Hauptaufgabe wird die Synchronisation zwischen Threads geübt.
+  Dabei wird unter anderem das Prinzip eines Monitors verwendet.
+\end{abstract}
+\tableofcontents
+% ----------------------------------------------------------------------------
+\flushleft
+\section{Vorübung: Makefile}
+Für den Entwurf wird das Makefile einfach hier reinkopiert.
+
+\begin{makecode}
+  EXE = critsect02
+
+  CC = /usr/bin/gcc
+
+  CFLAG  = -pthread
+  CFLAG += -g
+  CFLAG += -Wall
+
+  LDFLAG = -lpthread
+
+  SRC = critsect02.c
+
+  # targets (all is default, because it is on top.)
+  all: $(EXE)
+
+  run: $(EXE)
+  	./$(EXE)
+
+  $(EXE): $(SRC)
+  	$(CC) $(CFLAG) $(LDFLAG) -o $@ $<
+
+  clean:
+  	rm -f $(EXE)
+\end{makecode}
+
+
+\section{Thread-Koordination in der Muckibude}
+
+In dieser Aufgabe soll die Thread-Koordination mit den Bibliotheken der
+POSIX Threads und Semaphoren unter Linux geübt werden. Dafür schicken wir 5
+Philosophen (Threads) in die Muckibude. Wie wir die Koordination der Gewichte
+(Daten) zwischen den Philosophen realisieren, soll in den folgenden Abschnitten
+erläutert werden.
+
+\subsection{Überblick}
+Dieser Abschnitt dient dazu, um sich schnell ein Bild machen zu können.
+
+Das Programm wird aus folgenden Quellcodedatein zusammengestellt:
+\begin{enumerate}
+  \item[parameter.h] Hier sind alle Konstanten für die Implementierung
+    definiert.
+  \item[gym.c] Realisierung eines Monitors mit zwei Monitorfunktionen und den
+    (empfindlichen) Daten: den Gewichten. Zudem weitere Hilfsfunktionen.
+  \item[gym.h] Das Interface für Funktionen und Typedefinitionen.
+  \item[philo.c] Die Threadfunktion, welche die Philosophen zu einem Zyklus
+    des Gewichte Holens, Hebens, Weglegens, Ausruhens treibt.Zudem Deklaration
+    des globalen Behlsfeldes.
+  \item[philo.h] Das Interface und die externe Bekanntmachung des globalen
+   Befehlsfeldes.
+  \item[global.c] Die Funktion \texttt{handle\_error} wird hier implementiert.
+    Damit wird der Rückgabewert von einer Bibliotheksfunktion ausgewertet,
+    bei einem Fehler die entsprechende Meldung ausgegeben und das Programm
+    beendet.
+  \item[global.h] Das Interface für \texttt{handle\_error}. Zudem werden hier
+    \texttt{TRUE} und \texttt{FALSE} definiert.
+  \item[main.c] Die Mainfunktion mit weiteren Hilfsfunktionen. Der Mainthread
+    koordiniert die Initialisierung und Zerstörung der anderen Threads und
+    deren Objekte. Zudem steuert der Mainthread die interaktive Befehlannahme
+    über die Konsole.
+\end{enumerate}
+
+Es sollen kurz die Prototypen der wichtigesten Funktionen aufgelistet werden:
+\begin{ccode}
+//     GYM
+void init_gym_obj();  // init the stock, bags, pthread_mutex and pthread_cond
+
+void free_gym_obj();  // destroys the pthread_mutex and pthread_cond
+void free_gym_threads(); //  set is_quit = TRUE and pthread_cond_broadcast
+
+int get_weights( int tid );  // monitor func
+int put_weights( int tid );  // monitor func
+int display_status( void );  // is called in monitor functions
+
+int fill_bag( weight_bag_t * bag);  // get the weights form stock into bag
+void flush_bag(weight_bag_t * bag); // put the weights back in stock
+
+//     PHILO
+void init_philo_obj(void);  // init philostructur, semaphore
+void free_philo_obj(void);  // destroy the semaphore
+
+void * philothread (void * ptr_tid); // thread function, no return, param tid
+
+void set_train_status(train_state_t state, int tid); // used by monitor func
+
+void unblock_philo(int tid);  // used to unblock the thread
+
+//     GLOBAL
+void handle_error(            // an universal tool
+int result, int errnum, char const *mssge
+);
+
+\end{ccode}
+
+
+Und hier der Parameterheader
+\begin{ccode}
+  #define NPHILO      5
+  //#define PHILO_NAMES { "Anne", "Bernd", "Clara", "Dirk", "Emma" }
+  #define PHILO_KG    {      6,       8,      12,     12,     14 }
+
+  #define NWEIGHTS_T 3
+  #define WEIGHT_KG  { 2, 3, 5 }
+  #define WEIGHT_QTY { 4, 4, 5 }
+
+  #define REST_LOOP   1000000000
+  #define WORKOUT_LOOP 500000000
+\end{ccode}
+
+
+\subsubsection{Programmablauf}
+\textbf{Der Mainthread} erzeugt bzw. initialisiert alle Objekte. Dann werden
+die Pthreads (Philosophen) gestarted. Danach ist der Mainthread in der
+Kontrollerschleife. In dieser Endlosschleife wartet der
+Mainthread auf eine Eingabe aus der \texttt{stdin} und überprüft diesen
+auf die Befehle:
+\begin{enumerate}
+  \item[q oder Q] Beendet das Programm sauber.
+  \item[\texttt{tid}b] Blockier Thread Nummer tid.
+  \item[\texttt{tid}u] Befreit Thread Nummer tid.
+  \item[\texttt{tid}p] Thread Nummer tid überspringt die REST und WORK\_OUT
+   Schleifen.
+\end{enumerate}
+
+Ein akzeptierte Befehl wird entschlüsselt und
+bearbeitet. Wenn der Befehl zum Schließen des Programms erkannt wurde, werden
+alle Philosophethreads gebeten, sich zu beenden (über das globale
+Befehlsfeld). Alle blockierten Threads werden befreit, indem man die
+Blockierungsobjekte freigibt. Der Mainthread wartet nun dadrauf, dass alle
+Threads terminierten und zerstört alle erstellten Objekte. Erst dann beendet
+sich der Mainthread und terminiert somit das Programm.
+
+\textbf{Einem Philothread} wird die Nummer (\texttt{tid}) mitgegeben, mit
+welcher er auf die für ihn wichtigen Felder zugreifen und diese manipulieren kann.
+Er durchläuft in einer Endlosschleife, in der er vier Funktionen pro Schleife
+ausführt. Zwei davon sind fast leere Zählerschleifen, in den er auf die
+Befehle in dem globalen Array reagiert. Die anderen beiden Funktionen werden
+durch das Monitormodell realisiert, um die Konsistenz der Daten (Gewichte)
+wahren zu können. In diesen beiden Funktionen ignoriert der Philothread zunächst die
+Befehle des Mainthreads. In den Funktionen des Monitors wird beim Eintreten in
+und beim Austreten aus dem geschützten Bereich innerhalb diesem der Status auf
+der Console ausgegeben.
+
+\subsection{Sichtbarkeit der Objekte}
+  Da es sich um eine statische Anzahl an Threads und Objekten handelt, konnen
+  die Objekte ebenfalls statisch sein. Unsere Synchronisationsobjekte haben
+  zudem Dateisichtbarkeit. Somit wird für jede C-Datei eine Initialisierungs-
+  und eine Zerstörungsfunktion implementiert, welche dann von dem Mainthread
+  aufgerufen wird.
+  Das globale (zwischen mehreren C-Datein sichtbar) Befehlsfeld ist von
+  main.c und von philo.c aus sichtbar.
+
+  Wir haben uns gegen dynamischen HEAP-Speicher entschieden, das dies keinen
+  Sinn ergebe, da kein Mehrwert für uns zu erkennen war.
+
+\subsubsection{Struckturen der Objekte}
+
+Gerade die zu schützenden Objekt sind hier von großer Bedeutung, die Gewichte.
+Dabei verwaltet gym.c alle weight Objekte, auch die der Philosophen.
+Beim erstenblick ist das zunächst komisch, warum der Philosoph selber nicht
+weiß, wie viel er für sein Training an kg bekommt. Die Muckibude brauch als
+einzige diesen Wert, um die Gewichte aus dem Lager (\texttt{stock}) in die für
+den Philosophen bereitgestellten Gewichtetasche zu füllen (\texttt{bag});
+
+Deswegen hat die Muckibude folgende Struckturen im statischen privaten
+Sichtbarbeitsfeld:
+\begin{ccode}
+  typedef struct {
+      int kg;        // type
+      int qty;       // quantity
+  } weight_t;
+
+  struct{
+      weight_t weights[ NWEIGHTS_T ]; // slots
+      int total_kg;                   // total amount of all weights in the gym
+      int available_kg;               // amount what is left
+  } stock;
+
+  typedef struct {
+      weight_t weights [ NWEIGHTS_T ];   // slots
+      int required_kg;                   // required for a effective trainigs
+  } weight_bag_t;
+
+  weight_bag_t bags[NPHILO];             // for every philo one bag
+
+  pthread_mutex_t gym_mtx;
+  pthread_cond_t gym_cv;
+\end{ccode}
+
+Die Philosphen haben primär die Information, in welchem Status sie sich grade
+befinden:
+\begin{ccode}
+typedef enum {
+    QUIT=20,
+    BLOCKED,
+    NORMAL
+} cmd_state_t;
+
+typedef enum {
+    GET_WEIGHTS=10,
+    WORKOUT,
+    PUT_WEIGHTS,
+    REST
+} train_state_t;
+
+typedef struct {
+    sem_t mtx;
+    cmd_state_t cmd_state;
+    train_state_t train_state;
+    int tid;
+} philo_t;
+
+extend char cmd_arr[];
+\end{ccode}
+
+\subsection{Die Muckibude als Monitor}
+  Die Muckibude \texttt{gym.c} hat als Synchronisationsobjecte einen POSIX
+  Mutex \texttt{gym\_mtx} und eine POSIX Bedingungsvariable \texttt{gym\_cv}.
+  Beim Eintreten und Verlassen des geschützten Bereich, wird jeweils die
+  Der Trainierstatus des Philothreates entsprechend geänder und
+  \texttt{display\_status} aufgerufen. \texttt{display\_status} überprüft
+  ob auch kein Gewicht verloren gegengen ist und gibt ggf eine Fehlermeldung
+  aus.
+
+  Nur die Threads, die auf die sich Gewichte holen wollen
+  (\texttt{GET\_WEIGHTS}), können auf Grund der beschränkten verfügbaren Gewichte die
+  erforderlichen Gewichte nicht holen. Somit warten
+  sie auf der POSIX Bedingungsvariable in einer Whileschleife und geben den
+  geschützen Bereich wieder frei. Wenn aber einige Gewicht von einem anderen
+  Thread wieder zurückgelegt wurden (\texttt{PUT\_WEIGHTS}), wird vor dem
+  Auftreten aus dem sicheren Bereich alle auf Bedingungsvariablen sitzenden
+  Threads geweckt, welche dann wiederum prüfen können, ob sie diesmal die
+  Gewichte kriegen können.
+
+  Das folgende Listing ist ein Auszug aus unserem bisherigen Code. Es zeigt die
+  beiden Monitorfunktionen. Die zweite Bedingung ist für die Freisetzung der
+  blockierenden Threads, nachdem der Beendenbefehl erteilt wurde.
+
+  \begin{ccode}
+    int get_weights(int tid){
+        int no_weights_fit_cond;
+        int res=-1;
+        res = pthread_mutex_lock( &gym_mtx );                 // MONITOR START
+        handle_error( res, errno,"pthread_mutex_lock ");
+
+        set_train_status(GET_WEIGHTS, tid);
+        display_status();
+
+        no_weights_fit_cond = fill_bag( &bags[tid] );
+        while( no_weights_fit_cond  || !is_quit ){
+            res = pthread_cond_wait( &gym_cv, &gym_mtx);
+            handle_error( res, errno,"pthread_cond_wait ");
+            get_weight_cond = fill_bag( &bags[tid] );
+        }
+
+        set_train_status(WORKOUT, tid);
+        display_status();
+        res = pthread_mutex_unlock( &gym_mtx );                  // MONITO END
+        handle_error( res, errno,"pthread_mutex_unlock ");
+        return 0;
+    }
+    //------------------------------------------------------------------------
+    int put_weights(int tid){
+        int res=-1;
+        res = pthread_mutex_lock( &gym_mtx );                 // MONITOR START
+        handle_error( res, errno,"pthread_mutex_lock ");
+
+        set_train_status(PUT_WEIGHTS, tid);
+        display_status();
+
+        flush_bag(&bags[tid]);
+
+        res = pthread_cond_broadcast( &gym_cv );     // wakes all cond waiters
+        handle_error( res, errno,"pthread_cond_signal ");
+        set_train_status(REST, tid);
+        display_status();
+
+        res = pthread_mutex_unlock( &gym_mtx );                 // MONITOR END
+        handle_error( res, errno,"pthread_mutex_unlock ");
+        return 0;
+    }
+  \end{ccode}
+
+\subsubsection{Befehl wird zur höflichen Bitte}
+  Die Befehle werden nach dem Entschlüssen (siehe bei Sonstiges), in ein
+  globales Feld gelegt. Der Thread prüft in seinenem \texttt{WORK\_OUT}
+  oder \texttt{REST} Zustand (also in den Zählerschleifen), ob es einen Befehl
+  gibt und blokiert sich ggf. selber mit seinem Semaphoren oder überspringt
+  die Zählerschleife oder setzt zudem seinen Befehls Zustand auf \texttt{QUIT}
+  und terminiert. Einzige Ausnahme von dieser höflichen Form ist der
+  Befehl zum Entblocken. Dort wird direkt der Semaphor um einen erhöht und
+  somit der Thread wieder geweckt.
+
+
+\subsection{Fehlerbehandlung}
+Grundsätzlich terminiert die Funktion \texttt{handle\_error} das Programm. Also
+beendet jeder fehlgeschlagene Bibliotheksfunktionsaufruf (sofern alle
+abgegriffen werden) das Programm. Fehler, die wir selber definieren, wie das
+Abhandenkommen von Gewichten, werden nur zur Kenntnis genommen. Auch ein
+ungültiger Befehl gibt kurz eine Meldung aus lässt das Programm weiter laufen.
+
+\subsection{Sonstiges}
+
+Wie werden die Befehle ausgelesen:
+\texttt{fgets} liefert einen String zurück, der leider auch das
+  Zeilenumbruchzeichen von dem \texttt{NULL} einfügt.
+  Bevor man das Befehlsmuster mit dem erhaltenen Befehlsstring vergleicht,
+  wird der Zeilenumbruch mit \texttt{NULL} ersetzt. In kurzform so:
+
+  \begin{ccode}
+    fgets(cmd_s, NBUFF,stdin)
+    cmd_s[strcspn(cmd_s, "\n")]= '\0';
+    if (strcmp("q", cmd_s) ) ....
+  \end{ccode}
+
+  Die Threadnummer erhählten wir, indem man mit einer Zählerschleife alle
+  Threadnummermöglichkeiten mit dem Characterwert der Null summiert und das
+  Ergebnis mit dem ersten Character im Befehlsstring vergleicht.
+  Nach erkannter Threadnummererkennung wird der zweite Character mit
+  Befehlsmustern verglichen und zur richtigen Ausführung verzweigt.
+
+  \begin{ccode}
+    for(int i =0; NPHILO > i ; i++){
+        int target = -1;
+        if (cmd_s[0]== i + '0' ){
+            target = i;
+        }
+    }
+    if (0 <= target ){
+        switch (cmd_s[1]){
+            case b:
+            ...
+  \end{ccode}
+
+
+
+\end{document}

@@ -1,0 +1,43 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: cies-deploy
+  namespace: cies
+spec:
+    #selector:
+      # matchLabels:
+      #service: cies-svc
+  template:
+    metadata:
+        # labels:
+          #       service: cies-svc
+    spec:
+      containers:
+      - image: nexus.informatik.haw-hamburg.de/cies-main
+        name: cies-co
+        volumeMounts:
+        - mountPath: "/mnt/cies-vol/_data/"
+          name: data-pv
+        ports:
+        - containerPort: 3393
+      volumes:
+      - name: data-pv
+        persistentVolumeClaim:
+          namespace: cies
+          claimName: data-pv-claim
+          #---
+#apiVersion: v1
+#kind: Service
+#metadata:
+#labels:
+#   service: cies-service
+# name: cies-svc
+#spec:
+#    ports:
+#  - name: http
+#        port: 80
+#     protocol: TCP
+#     targetPort: 80
+#    selector:
+#    service: cies-svc
+#  type: ClusterIP

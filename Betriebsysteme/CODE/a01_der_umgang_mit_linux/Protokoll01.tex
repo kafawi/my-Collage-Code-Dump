@@ -1,0 +1,355 @@
+\documentclass[
+   draft=false
+  ,paper=a4
+  ,twoside=false
+  ,fontsize=11pt
+  ,headsepline
+  ,BCOR10mm
+  ,DIV11
+  ,parskip=full+
+]{scrartcl} % copied from Thesis Template from HAW
+
+\usepackage[ngerman,english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage[german,refpage]{nomencl}
+
+\usepackage{float}
+\usepackage{enumitem}
+\usepackage{hyperref} % for a better experience
+
+\hypersetup{
+   colorlinks=true % if false - links get colored frames
+  ,linkcolor=black % color of tex intern links
+  ,urlcolor=blue   % color of url links
+}
+
+\usepackage{array}   % for \newcolumntype macro
+\newcolumntype{L}{>{$}l<{$}} % math-mode version of "l" column type
+\newcolumntype{R}{>{$}r<{$}} % math-mode version of "r" column type
+\newcolumntype{C}{>{$}c<{$}} % math-mode version of "c" column type
+
+%\usepackage{listing}
+\usepackage{caption}
+%\usepackage{xcolor}
+%\definecolor{bg}{rgb}{0.60,0.95,0.95}
+%using minted because of the hashtag in bash
+\usepackage{minted}
+\usepackage{mdframed}
+%\newfloat{program}{tbp}{lop}%
+\sloppy
+
+\clubpenalty=10000
+\widowpenalty=10000
+\displaywidowpenalty=10000
+
+
+\begin{document}
+
+\selectlanguage{ngerman}
+\usemintedstyle{emacs}
+% ----------------------------------------------------------------------------
+% Titel (erst nach \begin{document}, damit babel bereits voll aktiv ist:
+\titlehead{Betriebsysteme WS 2016 Praktikum 01 Protokoll}% optional
+\subject{BS Praktikumsaufgabe 01}
+\title{Der Umgang mit Linux}
+\subtitle{Version 1.0 - Abgabe am 25. Oktober 2016}
+\author{Alexander Mendel  Karl-Fabian Witte}
+\date{erstellt am \today}% sinnvoll
+%\publishers{Platz für Betreuer o.\,ä.}% optional
+% ----------------------------------------------------------------------------
+\maketitle% verwendet die zuvor gemachte Angaben zur Gestaltung eines Titels
+\begin{abstract}
+  In diesem Praktikum soll der Umgang mit Linux geübt werden.
+  Dafür werden Grundprinzipien und Aufbau der Linuxschnittstellen geübt.
+  Zum Schluss soll die \texttt{bash} noch einmal genauer mit einem Skript
+  gelernt werden.
+\end{abstract}
+\tableofcontents
+% ----------------------------------------------------------------------------
+\flushleft
+\section{Die Macht der Kommandozeile}
+Es wird kurz der Umgang mit dem Terminal geübt. Es werden hier für die
+Aufgeben wichtigen Informationen dokumentiert. Das mitgelaufene Logbuch
+\texttt{typescript}, welches mittels \texttt{script} gestartet wurde, ist im
+Reposetory zu finden (siehe Abschnitt 3). Zudem werden einige fundamentalen
+Kenntnisse für Linuxnutzer mit auf den Weg gegeben.
+
+\begin{enumerate}
+  \item \textbf{Was ist \emph{Tab-Expansion} und was nützt Ihnen das bei der
+  Arbeit mit der Kommandozeile?}\newline
+  Die \emph{Tab-Expansion} vervollständigt das angefangene Befehlswort (oder
+  auch Verzeichnis- und Dateinamen) in der Shell-Kommandozeile. Wenn im
+  Terminal \textbf{<Tab>} gedrückt wird, wird der angefangene String bis zur
+  Mehrdeutigkeit vervollständigt und beim erneuten Drücken der \textbf{<Tab>}
+  werden die Möglichkeiten aufgezeit. Das folgende Beispiel verdeutlich es:
+  \begin{minted}{bash}
+  $ ls -1
+  xy.pdf
+  xy.ps
+  $ acroread x               <- <Tab> druecken
+  $ acroread xy.p            <- nochmal <Tab> druecken
+  xy.pdf xy.ps
+  $ acroread xy.p
+  \end{minted}
+
+  \item \textbf{Was erhalten Sie beim Drücken der Tastenkombination
+  \textbf{<Alt><.>}?}\newline
+  \textbf{<Alt><.>} gibt das letzte Argument des letzten Befehls wieder.
+  Bein erneuten drücken wird das letzte Argument der vorletzten Befehls
+  an die Coursorposition gesetzt, und so weiter.
+
+  \item \textbf{Geben Sie das Verzeichnis nach \emph{Erweiterung} sortiert aus.
+  }
+  \begin{minted}{bash}
+  $ ls -X
+  \end{minted}
+
+  \item \textbf{Geben Sie das Verzeichnis nach \emph{Modifikationszeit}
+  sortiert aus.}
+  \begin{minted}{bash}
+  $ ls -t
+  \end{minted}
+
+  \item \textbf{Kehren Sie für beide Sortiervarianten die \emph{Reihenfolge}
+  um.}
+  \begin{minted}{bash}
+  $ ls -Xr
+  $ ls -tr
+  \end{minted}
+
+  \item \textbf{Geben Sie das Verzeichnis nach \emph{rekursiv} d.h. mit allen
+  Unterverzeichnissen aus.}
+  \begin{minted}{bash}
+  $ ls -R
+  \end{minted}
+
+  \item \textbf{Erläutern Sie die Operatioen von dem sort-Befehl
+  \texttt{ls -l | sort -rnk5}.}
+  \begin{minted}{bash}
+  $ ls -l | sort -rnk5
+------------------------
+  -r  : umgekehrte Reihenfolge
+  -n  : numerische Wertsortierung 0 < 1 < 2 ...
+  -k5 : die 5te Spalte (hier mit ls -l -> Dateigroesse)
+  \end{minted}
+  Es wird also nach Dateingröße absteigend sortiert.
+
+  \item \textbf{Dokumentieren Sie mit \texttt{ls -l } das Resultat Ihrer
+  Aktion.}
+  \begin{minted}{bash}
+  bs@linux-8b19:~/Bs_Prak> ls -l
+  insgesamt 16
+  lrwxrwxrwx 1 bs users    9 17. Okt 03:36 ltext2.txt -> text2.txt
+  lrwxrwxrwx 1 bs users    9 17. Okt 03:37 ltext3.txt -> text3.txt
+  -rw-r--r-- 1 bs users 3976 17. Okt 03:30 my_listing.txt
+  -rw-r--r-- 1 bs users   28 17. Okt 03:33 text04.txt
+  -rw-r--r-- 1 bs users   28 17. Okt 03:33 text2.txt
+  -rw-r--r-- 1 bs users   28 17. Okt 03:33 text3.txt
+  \end{minted}
+
+  \item \textbf{Editieren Sie \texttt{ltext3.txt}: Wie verändert sich
+  \texttt{text3.txt}?}\newline
+  Die Änderung ist von \texttt{ltext3.txt} ist auch in \texttt{text3.txt}
+  gespeichert worden.
+
+  \item \textbf{Was passiert, wenn Sie \texttt{ltext2.txt} löschen?}\newline
+  Die Beseitigung von \texttt{ltext2.txt} hat keine Auswirkung auf text2.txt
+
+  \item \textbf{Was passiert, wenn Sie \texttt{text3.txt} löschen?}\newline
+  Die Datei \texttt{ltext3.txt} ist ein symbolische Link, welcher wie eine
+  Windows gewöhnliche Verknüpfung funtioniert: Er verzweigt nur auf die
+  Originaldatei und enthält sonst keine Information. Da die Originaldatei nicht
+  mehr existiert, funtioniert \texttt{ltext3.txt} auch nicht mehr.
+  Anders wäre es mit einem harten Link (\texttt{ln text3.txt htext3.txt}).
+  Dieser verweist auf die physikalische Adresse, wie es die Originalsdatei auch
+  nur tut, und ist somit, von außen gesehen, eine synchronisierte Kopie.
+
+  \item \textbf{Demonstrieren Sie die Platzhalterzeichen mit eigenen
+  Beispielen.}
+  \begin{minted}{bash}
+  bs@linux-8b19:~/Bs_Prak> ls
+  ltext3.txt my_listing.txt text04.txt text2.txt
+  text04.txt text2.txt
+  bs@linux-8b19:~/Bs_Prak> ls *ext?.txt
+  ltext3.txt text2.txt
+  bs@linux-8b19:~/Bs_Prak> ls [ml]*
+  ltext3.txt my_listing.txt
+  bs@linux-8b19:~/Bs_Prak> ls [k-n]*
+  ltext3.txt my_listing.txt
+  \end{minted}
+
+
+  \item \textbf{Finden Sie heraus, was die Wirkung der Zeichen \texttt{\$},
+  \texttt{\^{}} und \texttt{\textbackslash <} ist. Warum musste der
+  Suchausdruck im letzten Beispiel in Anführungszeichen (\emph{quotes})
+  gesetzt werden?}
+  \begin{minted}{bash}
+  $ ls -l /etc/ | grep "\<fs"
+  # Es werden alle Zeilen ausgegeben, in denen Namen/Wörter vorkommen,
+  # die mit "fs" beginnen.
+
+  $ ls -1 /etc/ | grep ^fs
+  # Es werden alle Zeilen ausgegeben,  mit "fs" beginnen.
+
+  $ ls -l /etc/ | grep fs$
+  # Es werden alle Zeilen ausgegeben, die mit fs enden.
+  \end{minted}
+
+  \item \textbf{Geben Sie alle Prozesse aus, deren Kommandozeile mit k
+  beginnt.}
+  \begin{minted}{bash}
+  ps aux | grep ^k
+  # oder wenn man de Befehle will
+  # und nicht einen usernamen hat der mit k anfaengt
+  ps aux | grep "\<fs"
+  \end{minted}
+\end{enumerate}
+\clearpage
+
+\section{Vorgänge automatisieren: Shellskripte}
+
+Nun soll die Macht eines Shellskriptes kennen gelernt werden. Dafür wird erst
+ein gegebenes Skript analysiert. Danach soll dann eins selber geschrieben
+werden, was die Anzahl der Datein in einem Verzeichnis zurück gibt. Dabei wird
+die \texttt{bash} verwendet und gehofft, dass der Interpreter jede Zeile auch
+übersetzten kann.
+
+\begin{enumerate}
+  \item \textbf{Was tut das oben angegebene Shellskript?}\newline
+  Es fragt nach den Anwender an seinem Namen und und gibt dann in einem
+  \texttt{here file} eine schmucke ASCII-Begrüßung auf dem Terminal aus.
+  Zudem kann man mit dem Flag \texttt{-h} oder \texttt{--help} eine
+  Kurzanleitung sich ausgeben lassen. Alle weiteren Argumente werden nicht
+  geduldet.
+
+  \item \textbf{Wie bekommen Sie heraus, welche Version des C-Compilers
+  \texttt{gcc} auf Ihrer virtuellen Maschine installiert ist?}\newline
+  \texttt{gcc} ist ein ganz besonders gesittets Programm:
+  \begin{minted}{bash}
+  $ gcc --version
+  \end{minted}
+
+  \item \textbf{Schreiben Sie ein Shellskript \texttt{filecount.sh}, das die
+  Anzahl von Dateien der als Option spezifizierten Typen ausgibt. Mit der
+  Option \texttt{-h} oder \texttt{--help} soll es diesen Hilfetext ausgeben und
+  damit gleichzeitig erklären, was genau Sie implementieren sollen.}
+  \begin{minted}{bash}
+cat<<EOF
+  usage :
+    $0 [ OPTIONS ] DIRECTORY
+
+      Print the number of files in DIRECTORY
+      of types given in OPTIONS
+
+      Default: Print numbers of regular files
+      in current directory
+
+  OPTIONS :
+  FILE type options:
+    -f --regular-file  regular files
+    -l --symlink       symbolic links
+    -D --device        character and block devices
+    -d --directory     directories
+    -a --all           Include hidden files
+
+  Other options:
+    -h --help          Display this text
+    -e --echo          Print selected files
+    -v --verbose       print debugging messages
+    -V --version       print Versionsnumber
+EOF
+  \end{minted}
+Grundidee:
+\begin{minted}{bash}
+ls -l | egrep ^$TYPE | wc -l
+# for echo
+ls -l | egrep ^$TYPE | tee ...
+\end{minted}
+
+\end{enumerate}
+
+\subsection{filecount.sh - der Entwurf}
+Die Grundidee wurde uns ja schon gegeben. Beim Aufruf von \texttt{ls -l} ist
+der erste Character in einer Zeile ein Bezeichner \texttt{\$TYPE} für den
+\texttt{file type}. Diese Zeilen ziehen wir mit \texttt{egrep \^{}\$TYPE}
+heraus und lassen anschließend die Zeilen mit \texttt{wc -l} zählen.
+
+Die Optionsflag werden mit Hilfe der Funtion \texttt{getopt} herausgefiltert
+und in einer while-Schleife eingebetteten Fallunterscheidung (\texttt{case})
+die entsprechenden Optionen in dieser verarbeitet. Dabei ermöglicht
+\texttt{getopt} das Zusammenfassen der sogenannten \emph{short options} ohne
+diese Strings explizit in der Fallunterscheidung mit jeweils einem Fall zu
+unterscheiden.
+
+Die \texttt{file type opions} werden so behandelt, dass wir jeweils den
+\texttt{file type character} hinten an den zu Anfang leeren \texttt{TYPES}-
+String anhängen. Die Optionen \texttt{--help} und \texttt{--version} geben
+einen entsprechenden Text im Terminal aus und beenden das Skript. Für
+\texttt{--verbose} und \texttt{--echo} werden Flags gesetzt, die mit If-Blöcken
+entsprechende Extrafunktionen aufrufen. Beipiel:
+\begin{minted}{bash}
+if [ VERBOSE -eq 1 ]; then
+  echo "verbose mode activ"
+fi
+\end{minted}
+
+Wir haben uns entschlossen haben, dass die type-flags sich nicht gegenseitig
+ausschließen und man so eine Komposition an unteschiedlichsten Typen zählen
+lassen kann, werden wird der String \texttt{TYPES} wie folgt nach den Regeln
+der Regulären Ausdrücke verweden:
+\begin{minted}{bash}
+ls -l | egrep ^[$TYPES] | wc -l
+\end{minted}
+
+Wenn das all-Flag gesetzt wird, wird in zum einen in den \texttt{TYPES}-String
+nicht angehängt, sondern einfach alle Möglichkeiten der \emph{file types}
+geschrieben. (siehe \texttt{info ls}) Zudem, um auch versteckte Datein anzeigen
+zu lassen, müssen die ls-Option mit \texttt{-A} erweitert werden. Somit haben
+wir für diese Flags auch eine Variable \texttt{LSFLAGS} erstellt, um diese
+bei \texttt{-a} entsprechend zu ändern. (\texttt{ls -A} is almost-all ist,
+welche die hidden files darstellt, jedoch das current und parent directory
+nicht mitauflistet.)
+
+Sind alle Optionen angearbeitet, bleibt Dank \texttt{getopt} das nicht-Options-
+Argument stehen. Dieses fragen wir zunächst ab, ob es überhaupt ein gibt. Wenn
+keins übergeben wurde, bleibt die Variable \texttt{DIRECTORY} auf dem
+Defaultwert \texttt{'.'}. Wenn es ein Argument gibt, so wird getestet, ob es
+sich auch um ein \texttt{directory} handle. Wenn ja, wird dieses in
+\texttt{DIRECTORY} gespeichert. Ansonsten wird eine Fehlermeldung ausgegeben.
+Es wird nur ein directory akzeptiert, sodass ein weiters Argument auch zum
+Abbruch führt. Ist nichts in den leeren String \texttt{TYPES} bei der
+Falunterscheidungsschleife geschrieben worden, so wird dieser mit dem default
+für reguläre Files \texttt{char '-'} gefüllt. Zum Schluss wird die eigendliche
+Funktion mit dem Aufruf \texttt{calc} (eigene Funktion dieses Skripts)
+gestartet.
+
+Wir haben uns entschlossen, die Funktion \texttt{tee} anders zu verwenden: als
+einfaches entfärbendes Rohr, anstatt eines T-Stücks. Die Alternative dazu wird
+hier einmal vereinfacht dargestellt:
+\begin{minted}{bash}
+if [ $ECHO -eq 1 ]; then                    # echo mode
+  ls $LSFLAG | egrep ^[$TYPES] | tee | wc -l
+else                                        # no echo mode
+  ls $LSFLAG | egrep ^[$TYPES] | wc -l
+fi
+\end{minted}
+
+\subsection{filecount.sh - der Code}
+\inputminted[fontsize=\small
+            ,fontfamily=tt
+            ,linenos
+            ,frame=single
+            ]{bash}{filecount.sh}
+\captionof{listing}{filecount.sh : das komplette script}
+
+\section{Quellcode}
+
+In dem angehängten Verzeichnis ist das Shellskript \texttt{filecount.sh} und
+die die Logdatei \texttt{typescript}.
+Der komplette Quellcode zu den Aufgaben sowie zu diesem Dokument kann im
+Repository unter folgender URL betrachtet werden:\newline
+\url{https://bitbucket.org/bibutNkafawi/a01_der_umgang_mit_linux}
+
+\end{document}

@@ -1,0 +1,200 @@
+stages:
+   - scripttest
+   - dockerize1
+   - dockerize2
+   - dbinit
+   - regression_test
+   - dockerize_stable
+   - deploy
+
+
+variables:
+  DOCKER_HOST: "tcp://localhost:2375"
+  DOCKER_REGISTRY: "nexus.informatik.haw-hamburg.de"
+  SERVICE_NAME: "cies-main"
+  DO_DEFAULT: "cies-default"
+  DO_SEND_REPORT: "cies-send-report"
+  DO_LINUX_ANAYLYSE: "cies-linux-analyse"
+  DO_ANALYSE_STATIC: "cies-analyse-static"
+  TCAC_ID: 1045
+  TCDR_ID: 1044
+  GITLAB_PATH: "gitlab.informatik.haw-hamburg.de"
+  TSR: "CIES/TSR.git"
+  TCDR: "CIES/TCDR.git"
+  TCAC: "CIES/TCAC.git"
+  TCAC_URL: "git@gitlab.informatik.haw-hamburg.de:CIES/TCAC.git"
+  TCDR_URL: "git@gitlab.informatik.haw-hamburg.de:CIES/TCDR.git"
+  TSR_URL: "git@gitlab.informatik.haw-hamburg.de:CIES/TSR.git"
+  CAC_STABLE_ID: 1588
+  CAC_STABLE_URL: "git@gitlab.informatik.haw-hamburg.de:CIES/CAC_stable.git"
+  CAC_STABLE_NAME: "CAC_stable"
+
+
+
+#scripttest:pipeline_setup:
+#  stage: scripttest
+#  image: $DOCKER_REGISTRY/$DO_LINUX_ANAYLYSE:latest
+#  only:
+#    - feat/analysePipeline
+#  script:
+#    - PROJECT_DIR=PROJECT
+#    - SCRIPT_DIR=SCRIPT
+#    - REPORT_DIR=REPORT
+#    - GITSHA_FILENAME="gitsha.txt"
+#    - PYSCRIPTS_PATH="/mnt/pyscripts"
+    #- echo "setup pipeline dry run till it works"
+    #- python3 ./pyscripts/setup_pipeline.py $TCDR_ID $PROJECT_DIR $SCRIPT_DIR $REPORT_DIR $GITSHA_FILENAME $PYSCRIPTS_PATH
+    #- python3 ./pyscripts/pipeline_setup.py $TCDR_ID $EMAIL_USER $NEXUS_USER $TSR_URL "${SSH_KEY_TSR}" $ACCESS_TOKEN "master"
+
+# scripttest:reg_test:
+#  stage: scripttest
+#  image: $DOCKER_REGISTRY/$DO_LINUX_ANAYLYSE:latest
+#  only:
+#    - feat/analysePipeline
+#  script:
+#    - echo "ret_test dry run till validation"
+#    - python3 ./pyscripts/reg_test.py $TCDR_ID $EMAIL_USER $NEXUS_USER $TSR_URL "${SSH_KEY_TSR}" $ACCESS_TOKEN "master"
+
+
+
+# scripttest:data_handler:
+#  stage: scripttest
+#  image: $DOCKER_REGISTRY/$DO_LINUX_ANAYLYSE:latest
+#  only:
+#    - feat/analysePipeline
+#  script:
+#    - PROJECT_PATH=$(pwd)"/PROJECT/"
+#    - cd ./pyscripts
+#    - python3 data_handler.py
+#    - python3 test_scripts.py -i $TCDR_ID 0 "123" $EMAIL_USER
+#    - SETUP_SSH_PATH=$(pwd)"/setup_ssh.sh"
+#    - python3 setup_pipeline.py -a $TCDR_ID $PROJECT_PATH $SETUP_SSH_PATH
+#    - ls -la
+#    - cd ..
+#    - ls -ls
+#    - cd $PROJECT_PATH
+#    - ls -la
+
+# scripttest:shell_helper:
+#  stage: scripttest
+#  image: $DOCKER_REGISTRY/$DO_LINUX_ANAYLYSE:latest
+#  only:
+#    - feat/analysePipeline
+#  script:
+#    - cd ./pyscripts
+#    - python3 shell_helper.py
+
+default:latest:
+ stage: dockerize1
+ image: $DOCKER_REGISTRY/docker:icc-dind
+ except:
+   - feat/db
+   - test/master
+ services:
+   - $DOCKER_REGISTRY/docker:icc-dind
+ script:
+   - echo $DOCKER_REGISTRY
+   - docker login -u $NEXUS_USER -p $NEXUS_PW $DOCKER_REGISTRY
+   - docker build -t $DO_DEFAULT:latest .
+   - docker tag $DO_DEFAULT:latest $DOCKER_REGISTRY/$DO_DEFAULT:latest
+   - docker push $DOCKER_REGISTRY/$DO_DEFAULT:latest
+
+# dockerize:linuxanalyse:
+#  stage: dockerize2
+#  image: nexus.informatik.haw-hamburg.de/docker:icc-dind
+#  except:
+#    - feat/db
+#    - test/master
+#  services:
+#    - nexus.informatik.haw-hamburg.de/docker:icc-dind
+#  script:
+#    - echo $DOCKER_REGISTRY
+#    - docker login -u $NEXUS_USER -p $NEXUS_PW $DOCKER_REGISTRY
+#    # just try this
+#    - docker images
+#    - docker build -t $DO_LINUX_ANAYLYSE:latest ./dockerfiles/linux_analyse/
+#    - docker tag $DO_LINUX_ANAYLYSE:latest $DOCKER_REGISTRY/$DO_LINUX_ANAYLYSE:latest
+#    - docker push $DOCKER_REGISTRY/$DO_LINUX_ANAYLYSE:latest
+
+send-and-deliver:latest:
+  stage: dockerize2
+  image: $DOCKER_REGISTRY/docker:icc-dind
+  except:
+    - feat/db
+    - test/master
+  services:
+    - $DOCKER_REGISTRY/docker:icc-dind
+  script:
+    - echo $DOCKER_REGISTRY
+    - docker login -u $NEXUS_USER -p $NEXUS_PW $DOCKER_REGISTRY
+    - docker build -t $DO_SEND_REPORT:latest ./dockerfiles/send_report/
+    - docker tag $DO_SEND_REPORT:latest $DOCKER_REGISTRY/$DO_SEND_REPORT:latest
+    - docker push $DOCKER_REGISTRY/$DO_SEND_REPORT:latest
+
+# db_init:
+#   stage: dbinit
+#   image: $DOCKER_REGISTRY/$DO_LINUX_ANAYLYSE_NAME:latest
+#   only:
+#     - feat/db
+#   script:
+#     - pwd
+#     - cd ./pyscripts/
+#     - ls
+#     - python3 db_feed.py $EMAIL_USER $EMAIL_SERVER $EMAIL_PW $EMAIL_PORT
+
+# REGESSEION TEST --------------------------------------------------------------------start
+
+tsr:master:
+ stage: regression_test
+ image: $DOCKER_REGISTRY/$DO_LINUX_ANAYLYSE:latest
+ #only:
+ #  - feat/analysePipeline
+ script:
+   - echo "start regression test"
+   - python3 ./pyscripts/reg_test.py $TCDR_ID $EMAIL_USER $NEXUS_USER $TSR_URL "${SSH_KEY_TSR}" $ACCESS_TOKEN "master"
+   - echo "end regression test"
+# REGESSEION TEST ----------------------------------------------------------------------end
+
+# STABLE DOCKERIZE -------------------------------------------------------------------start
+static:stable:
+  stage: dockerize_stable
+  image: $DOCKER_REGISTRY/docker:icc-dind
+  only:
+     - master
+  services:
+    - $DOCKER_REGISTRY/docker:icc-dind
+  script:
+    - echo $DOCKER_REGISTRY
+    - docker login -u $NEXUS_USER -p $NEXUS_PW $DOCKER_REGISTRY
+    - docker pull $DOCKER_REGISTRY/$DO_LINUX_ANAYLYSE:latest
+    - docker tag $DOCKER_REGISTRY/$DO_LINUX_ANAYLYSE:latest $DOCKER_REGISTRY/$DO_LINUX_ANAYLYSE:stable
+    - docker push $DOCKER_REGISTRY/$DO_LINUX_ANAYLYSE:stable
+
+default:stable:
+  stage: dockerize_stable
+  image: $DOCKER_REGISTRY/docker:icc-dind
+  only:
+     - master
+  services:
+    - $DOCKER_REGISTRY/docker:icc-dind
+  script:
+    - echo $DOCKER_REGISTRY
+    - docker login -u $NEXUS_USER -p $NEXUS_PW $DOCKER_REGISTRY
+    - docker pull $DOCKER_REGISTRY/$DO_DEFAULT:latest
+    - docker tag $DOCKER_REGISTRY/$DO_DEFAULT:latest $DOCKER_REGISTRY/$DO_DEFAULT:stable
+    - docker push $DOCKER_REGISTRY/$DO_DEFAULT:stable
+
+send-and-deliver:stable:
+  stage: dockerize_stable
+  image: $DOCKER_REGISTRY/docker:icc-dind
+  only:
+     - master
+  services:
+    - $DOCKER_REGISTRY/docker:icc-dind
+  script:
+    - echo $DOCKER_REGISTRY
+    - docker login -u $NEXUS_USER -p $NEXUS_PW $DOCKER_REGISTRY
+    - docker pull $DOCKER_REGISTRY/$DO_SEND_REPORT:latest
+    - docker tag $DOCKER_REGISTRY/$DO_SEND_REPORT:latest $DOCKER_REGISTRY/$DO_SEND_REPORT:stable
+    - docker push $DOCKER_REGISTRY/$DO_SEND_REPORT:stable
+# STABLE DOCKERIZE ---------------------------------------------------------------------end

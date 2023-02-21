@@ -1,0 +1,48 @@
+stages:
+    - dockerize
+    - deploy
+
+variables:
+ DOCKER_HOST: "tcp://localhost:2375"
+ DOCKER_REGISTRY: "nexus.informatik.haw-hamburg.de"
+ SERVICE_NAME: "cies-world"
+
+createImage:
+ stage: dockerize
+ image: nexus.informatik.haw-hamburg.de/docker:icc-dind
+ services:
+   - nexus.informatik.haw-hamburg.de/docker:icc-dind
+ script:
+   - docker login -u $NEXUS_USER -p $NEXUS_PW $DOCKER_REGISTRY
+   - docker build -t $SERVICE_NAME:latest .
+   - docker tag $SERVICE_NAME:latest $DOCKER_REGISTRY/$SERVICE_NAME:$CI_PIPELINE_ID
+   - docker tag $SERVICE_NAME:latest $DOCKER_REGISTRY/$SERVICE_NAME:latest
+   - docker push $DOCKER_REGISTRY/$SERVICE_NAME:$CI_PIPELINE_ID
+   - docker push $DOCKER_REGISTRY/$SERVICE_NAME:latest
+
+deploy_image:
+  environment:
+    name: ICC-K8s
+  stage: deploy
+  image: nexus.informatik.haw-hamburg.de/kubectl:v1.9.6
+  script:
+  - kubectl get deployments
+  - kubectl get pods
+  - kubectl get services
+  - kubectl get rs
+  - kubectl get ing
+  - kubectl delete deploy $SERVICE_NAME
+  - kubectl get pods
+  - kubectl get services
+  - kubectl get rs
+  - kubectl get ing
+  - kubectl delete svc $SERVICE_NAME
+  - kubectl get pods
+  - kubectl get rs
+  - kubectl get ing
+  - kubectl delete po --all
+  - kubectl get rs
+  - kubectl get ing
+  - kubectl delete ing --all
+  - kubectl apply -f deploy.yaml
+  - kubectl get deployments

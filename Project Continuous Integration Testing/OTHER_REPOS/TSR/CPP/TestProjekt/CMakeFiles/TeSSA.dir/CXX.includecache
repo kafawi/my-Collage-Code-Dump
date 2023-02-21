@@ -1,0 +1,42 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/lennart/Schreibtisch/TeSSA/TestProjekt/Data.cpp
+iostream
+-
+Data.h
+/home/lennart/Schreibtisch/TeSSA/TestProjekt/Data.h
+cstdlib
+-
+cstring
+-
+
+/home/lennart/Schreibtisch/TeSSA/TestProjekt/Data.h
+
+/home/lennart/Schreibtisch/TeSSA/TestProjekt/Manager.cpp
+iostream
+-
+cstring
+-
+Manager.h
+/home/lennart/Schreibtisch/TeSSA/TestProjekt/Manager.h
+Data.h
+/home/lennart/Schreibtisch/TeSSA/TestProjekt/Data.h
+
+/home/lennart/Schreibtisch/TeSSA/TestProjekt/Manager.h
+iostream
+-
+Data.h
+/home/lennart/Schreibtisch/TeSSA/TestProjekt/Data.h
+
+/home/lennart/Schreibtisch/TeSSA/TestProjekt/main.cpp
+cstdlib
+-
+Manager.h
+/home/lennart/Schreibtisch/TeSSA/TestProjekt/Manager.h
+

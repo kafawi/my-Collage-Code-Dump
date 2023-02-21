@@ -1,0 +1,249 @@
+% PROTOKOLL BSP 02
+\documentclass[
+   draft=false
+  ,paper=a4
+  ,twoside=false
+  ,fontsize=11pt
+  ,headsepline
+  ,BCOR10mm
+  ,DIV11
+  ,parskip=full+
+]{scrartcl} % copied from Thesis Template from HAW
+
+\usepackage[ngerman,english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage[german,refpage]{nomencl}
+
+\usepackage{float}
+\usepackage{enumitem}
+\usepackage{hyperref} % for a better experience
+
+\hypersetup{
+   colorlinks=true % if false - links get colored frames
+  ,linkcolor=black % color of tex intern links
+  ,urlcolor=blue   % color of url links
+}
+
+\usepackage{amsmath}
+
+\usepackage{array}   % for \newcolumntype macro
+\newcolumntype{L}{>{$}l<{$}} % math-mode version of "l" column type
+\newcolumntype{R}{>{$}r<{$}} % math-mode version of "r" column type
+\newcolumntype{C}{>{$}c<{$}} % math-mode version of "c" column type
+
+%\usepackage{listing}
+\usepackage{caption}
+%\usepackage{xcolor}
+%\definecolor{bg}{rgb}{0.60,0.95,0.95}
+%using minted because of the hashtag in bash
+\usepackage{minted}
+% c listing
+\newminted{c}{fontsize=\small
+             ,fontfamily=tt
+             ,linenos
+             ,frame=single
+             } % \begin{ccode} ... \end{ccode}
+\newmintedfile{c}{fontsize=\small
+                 ,fontfamily=tt
+                 ,linenos
+                 ,frame=single
+                 ,autogobble
+                 } % \cfile{}
+% Makefile listing
+\newminted{make}{fontsize=\small
+             ,fontfamily=tt
+             ,linenos
+             ,frame=single
+             }  % \begin{makecode} ... \end{makecode}
+\newmintedfile{make}{fontsize=\small
+                    ,fontfamily=tt
+                    ,linenos
+                    ,frame=single
+                    ,autogobble
+                    } % \makefile{}
+\sloppy
+\clubpenalty=10000
+\widowpenalty=10000
+\displaywidowpenalty=10000
+
+\begin{document}
+
+\selectlanguage{ngerman}
+\usemintedstyle{emacs}
+% ----------------------------------------------------------------------------
+% Titel (erst nach \begin{document}, damit babel bereits voll aktiv ist:
+\titlehead{Betriebssysteme WS 2016 Praktikum 04}% optional
+\subject{BS Praktikumsaufgabe 04}
+\title{Ein Kernelmodul mit Stoppuhrfunktion}
+\subtitle{Version 0.6 - Abgabe am \today 16:00}
+\author{Alexander Mendel \\ Karl-Fabian Witte}
+\date{erstellt am \today}% sinnvoll
+%\publishers{Platz für Betreuer o.\,ä.}% optional
+% ----------------------------------------------------------------------------
+\maketitle% verwendet die zuvor gemachte Angaben zur Gestaltung eines Titels
+\begin{abstract}
+    Es soll ein Kernelmodul / Treiber  mit Stoppuhrfunktion auf der
+    Virtuellen Maschine implementiert werden. Dabei zählt ein Gerät vorwärts
+    \texttt{/dev/timerf} und eins rückwärts \texttt{/dev/timerr}. Als
+    Zeiteinheit dienen die sogenannten \texttt{jiffes} (Takt der Maschine).
+    Ziel ist es, ein wenig in den Abgründen des Linuxkernels zu schnuppern und
+    sich mit den Konzepten der Treiberprogrammierung vertraut zu machen.
+\end{abstract}
+\tableofcontents
+% ----------------------------------------------------------------------------
+\flushleft
+\section{Entwurf}
+Es wird versucht sich an dem Buch "{}Linux Device Drivers"{} von Corbet,
+Rubini und Kroah-Hartman zu halten. Es sollen nur die zwei Geräte
+\texttt{timerr} und \texttt{timerf} erlaubt sein und diese auch nur jeweils in
+einmaliger Instanz.
+
+\subsection{init und cleanup}
+Jedes Modul wird über eine bestimmt Funktion initialisiert, die dem Makro
+\texttt{module\_init(fkt)} zum richtigen Einpflanzen in die Kernelerde
+übergeben wird. Zum Ausgraben wird dem Makro eine andere Funktion
+\texttt{module\_exit(fkt)} übergeben.
+
+\subsubsection{timer\_init}
+    Dies ist unsere Initialisationsfunktion. Zunächst wird eine Majornummer
+    allokiert und die statischen Variablen übergeben. Danach werden die
+    Geräte installiert, indem die Hilfsmethode \texttt{timer\_dev\_init}
+    für jeweils ein Device-Node ausgerufen wird. Dort wird der Speicher
+    der \texttt{timer\_dev} bestimmt und die Initialisierungswerte werden gesetzt.
+    Dazu wird die \texttt{cdev}-Struktur initialisiert, damit unser Gerät
+    auch mit der Umgebung agieren kann.
+\subsubsection{timer\_cleanup}
+    Hier werden in umgekehrter Reihenfolge die erzeugten Objekte wieder
+    zerstört.
+
+\subsection{Der Automat}
+Die Geräte sind Automaten, die auf folgende Befehle reagieren
+(z.B. \texttt{echo <cmd> > /dev/timerr}):
+\begin{enumerate}
+    \item[s :] Start:
+        \begin{enumerate}
+            \item[-] \texttt{timerf:} \texttt{READY}  $\to$ \texttt{RUNNING}
+            \item[-] \texttt{timerr:} \texttt{LOADED} $\to$ \texttt{RUNNING}
+        \end{enumerate}
+    \item[p :] Pause: \texttt{RUNNING} $\to$ \texttt{PAUSE}
+    \item[c :] Continue: \texttt{PAUSE} $\to$ \texttt{RUNNING}
+    \item[r :] Reset: (alle internen Zeitwerte zurücksetzten):
+        $\to$ \texttt{READY}
+    \item[l$<$value$>$ :] Laden (nur \texttt{timerr}):
+        \texttt{READY} $\to$ \texttt{LOADED}
+\end{enumerate}
+Dabei wird der Zustand der Geräte in der Funktion \texttt{timer\_write}
+entsprechend geändert und die Werte werden gesetzt. Es wird mit
+ \texttt{copy\_from\_user} in einen Kernelpuffer
+gefüllt und dann mit \texttt{strchr}
+ausgewertet.
+Die Ausgabe des aktuellen Zeitwertes wird in \texttt{timer\_read} berechnet
+und ausgegeben. Bei der Berechnung der Zeitwerte mit den jiffis ist zu
+beachten, dass diese nicht negativ werden können, jedoch gibt es Macros im
+jiffi header, welche den Vergleich zweier Zahlen zuverlässig im Zeitraum
+einiger Tage abnehmen. Hier wird mit
+\texttt{copy\_to\_user} die Ausgabe zum Benutzer geschickt. Sowohl
+\texttt{timer\_write} als auch \texttt{timer\_read} haben einen lokalen
+dynamischen Puffer, welcher mit einem Block auf einem Semaphoren (hier Mutex)
+sicher allokiert und wieder entfernt wird.
+
+\subsubsection{Hilfsfunktionen}
+Sowohl für \texttt{timer\_read} als auch für \texttt{timer\_write} wurden
+Hilfsfunktionen erstellt. Für \texttt{read} wurde die Berechnung der Zeit in
+\texttt{calc\_time} gekapselt. Dort wird mit den eher starren Zeitvariablen
+hantiert um die richtige Zeit zu berechnen, welche dann zurückgegeben wird.
+Dabei wird auf das makro \texttt{time\_befor64} die Rückwärtsuhr verwendet,
+um zu testen, ob die Zeit noch nicht erreicht wurde.
+
+In der \texttt{timer\_write} wird mit \texttt{get event} zunächst der String
+aus dem Userspace nach Befehlen durchsucht und ein entsprechendes
+\texttt{enum event} zurückgegeben. Da der Load aufruf auch ein Argument
+verlangt, wird eine Struktur mit \texttt{event} und \texttt{u64} zurückgegeben.
+In der Funktion \texttt{update\_state} wird dann mit einer Fallunterscheidung
+der Zustände der Automat entsprechend der Events umgeleitet und die
+Zeitwerte gesetzt.
+Nur beim Austritt aus dem Pausezustand wird der Offset erneut berechnet, von
+der aus die Zeit in \texttt{read} berechnent wird. Ansonsten finden
+alle Zeitberechnungen innerhalb \texttt{timer\_read} statt.
+
+
+\subsection{file\_operations}
+Hier soll einmal kurz \texttt{file\_operations} gezeigt werden, welche an
+die \texttt{cdev} weitergegeben wird, damit das Betriebssystem auch weiß,
+was zu tun ist.
+\begin{ccode}
+struct file_operations timer_fops = {
+    .owner   = THIS_MODULE,
+    .read    = timer_read,   /* Berechnung und Ausgabe der Zeit an User*/
+    .write   = timer_write,  /* Zustandsänderung */
+    .open    = timer_open,   /* Uebergabe der Geräteinfos ans file */
+    .release = timer_release, /* eigendlich nix */
+};
+\end{ccode}
+
+
+\subsection{Debugging}
+Im Kernel zu debuggen ist relativ umständlich. Es kann nicht mit einem
+Debugger gearbeitet werden. Es muss auf die gute alte "{}print everywhere and
+everything"{} Methode zurückgegriffen werden. Dafür wurde ein Makro
+\texttt{PDEBUG} erstellt, welches mit der Kernel eigenen Format-Print-Funktion
+\texttt{printk} und dem dazugehörigen Makro \texttt{KERN\_DEBUG} Meldungen an
+die Datei \texttt{/var/log/message} übergibt, welche wir dann in einer zusätzlichen
+Konsole mit \texttt{tail -f} "{}live"{} beobachten. Es werden mithilfe von
+\texttt{grep} oder \texttt{awk} die wichtigen Information heraus gefiltert.
+Es wurde zu dem eine
+Funktion \texttt{dev\_dump} erstellt, um den momentanen Status der Timer zu
+erfahren.
+
+\subsection{Installierung}
+Das \texttt{Makefile} (welches unbedingt mit großen "{}M"{}, sonst findet er
+das nicht vom Kernel aus) erstellt mit dem Befehl \texttt{make} das Modul. Die
+Compilerfalgs werden mit der vom Kernel eigenen Variable \texttt{ccflags-y}
+übergeben.
+Für das mühselige laden und löschen der "{}Geräte"{} wurde ein
+Shellskript \texttt{timer.sh} erstellt, welches mit den Optionen
+\texttt{--load, --unload} diese Arbeit abnimmt. Dabei ruft \texttt{load} die
+\texttt{unload}-Methode indirekt auf, um alte Geräte und Treiber zu entfernen.
+Danach wird dann der Treiber \texttt{insmod timer.ko} in den Kernel eingefügt,
+mit Hilfe von Linuxterminalhacks wird die Majornummer herausgeschrieben und
+mit dieser via \texttt{mknod} und der Minornummer die Geräte installiert.
+Und da das noch nicht bequem genug ist, kann man als Superuser mit
+\texttt{make load} bzw. \texttt{make unload} das laden auch so bewerkstelligen.
+%\section{Quellcode}
+
+\section{Sonstiges}
+
+Es wird für die Geräte die folgende Struktur verwendet, welche hier kurz
+aufgeführt wird.
+\begin{ccode}
+struct time {
+    u64 offset;
+    u64 enter_pause;
+    u64 load;
+}
+
+struct timer_dev {
+    int minor;              /* timerf or timerr */
+    char name[TIMER_NAME_LEN]  /* string for name */
+    struct time time;       /* time variables */
+    enum state state; /* current state */
+
+    struct semaphore sem;   /* mutex to avoid race conditions */
+    struct cdev cdev;       /* stuff for char devs */
+};
+
+\end{ccode}
+mit dem Befehl \texttt{/timer.sh --setup} kann man sich zwei Konsolen öffnen,
+wovon eine das Logfile anzeigt und das andere für die Befehlseingabe bereit
+steht.
+
+Es wird versucht, gänzlich auf \texttt{goto} zu verzichten, obwohl dieses im
+Buch für das Zusammenspiel zwischen \texttt{init} und \texttt{cleanup} sehr
+gut umgesetzt wurde. Für uns hat sich das \texttt{goto} noch nicht als großer
+Nutzen gezeigt, da wir ja auch nicht auf Performance aus sind.
+
+
+\end{document}
+% vim: set spell spelllang=de :EOF

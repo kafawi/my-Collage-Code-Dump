@@ -1,0 +1,30 @@
+stages:
+    - dockerize
+    - deploy
+
+variables:
+ DOCKER_HOST: "tcp://localhost:2375"
+ DOCKER_REGISTRY: "nexus.informatik.haw-hamburg.de"
+ SERVICE_NAME: "mongodb"
+
+createImage:
+ stage: dockerize
+ image: nexus.informatik.haw-hamburg.de/docker:icc-dind
+ services:
+   - nexus.informatik.haw-hamburg.de/docker:icc-dind
+ script:
+   - docker login -u $NEXUS_USER -p $NEXUS_PW $DOCKER_REGISTRY
+   - docker build -t $SERVICE_NAME:latest .
+   - docker tag $SERVICE_NAME:latest $DOCKER_REGISTRY/$SERVICE_NAME:$CI_PIPELINE_ID
+   - docker tag $SERVICE_NAME:latest $DOCKER_REGISTRY/$SERVICE_NAME:latest
+   - docker push $DOCKER_REGISTRY/$SERVICE_NAME:$CI_PIPELINE_ID
+   - docker push $DOCKER_REGISTRY/$SERVICE_NAME:latest
+
+deploy_image:
+  environment:
+    name: ICC-K8s
+  stage: deploy
+  image: nexus.informatik.haw-hamburg.de/kubectl:v1.8.3
+  script:
+    - kubectl apply -f mongodb-pvc.yaml
+    - kubectl apply -f deploy.yaml

@@ -1,0 +1,15 @@
+Artistic Style 2.06 beta                            11/13/17
+Using default options file /root/.astylerc
+------------------------------------------------------------
+Directory  ./TCDR/*.cpp
+------------------------------------------------------------
+------------------------------------------------------------
+Changes in ./TCDR/CPP/HELLO_WORLD/main.cpp
+./TCDR/CPP/HELLO_WORLD/main.cpp(3): int main(void)
+./TCDR/CPP/HELLO_WORLD/main.cpp(4): {
+./TCDR/CPP/HELLO_WORLD/main.cpp(5):     int dimension;
+./TCDR/CPP/HELLO_WORLD/main.cpp(6):     std::cout << "hello world of dimension " << dimension << std::endl;
+Formatted  CPP/HELLO_WORLD/main.cpp
+------------------------------------------------------------
+------------------------------------------------------------
+ 1 formatted   0 unchanged   0.00 seconds   9 lines

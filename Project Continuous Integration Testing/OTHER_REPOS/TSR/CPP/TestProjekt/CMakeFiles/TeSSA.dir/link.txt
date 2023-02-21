@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/TeSSA.dir/main.cpp.o CMakeFiles/TeSSA.dir/Manager.cpp.o CMakeFiles/TeSSA.dir/Data.cpp.o  -o TeSSA 

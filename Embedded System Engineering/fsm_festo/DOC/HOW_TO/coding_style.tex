@@ -1,0 +1,485 @@
+% PROTOKOLL Action Item
+\documentclass[
+   draft=false
+  ,paper=a4
+  ,twoside=false
+  ,fontsize=11pt
+  ,headsepline
+  ,DIV=11
+  ,parskip=full+
+  ,titlepage
+]{scrartcl} % copied from Thesis Template from HAW
+
+\usepackage[ngerman,english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage[
+    left  =4em
+   ,right =4em
+   ,top   =5em
+   ,bottom=5em
+]{geometry}
+
+\usepackage{longtable}
+\usepackage[german,refpage]{nomencl}
+
+\usepackage{float}
+%\usepackage{enumitem}
+\usepackage{paralist} %compactitem
+\usepackage{hyperref} % for a better experience
+
+\usepackage{scrpage2}
+\pagestyle{scrheadings}
+\clearscrheadfoot
+\ohead{\pagemark}
+\ihead{\headmark}
+\automark{section}
+
+\hypersetup{
+   colorlinks=true % if false - links get colored frames
+  ,linkcolor=black % color of tex intern links
+  ,urlcolor=blue   % color of url links
+}
+
+\usepackage{amsmath}
+
+\usepackage{array}   % for \newcolumntype macro
+\newcolumntype{L}{>{$}l<{$}} % math-mode version of "l" column type
+\newcolumntype{R}{>{$}r<{$}} % math-mode version of "r" column type
+\newcolumntype{C}{>{$}c<{$}} % math-mode version of "c" column type
+
+\usepackage{color}
+\definecolor{black}{rgb}{0,0,0}
+\definecolor{darkgray}{rgb}{0.2,0.2,0.2}
+\definecolor{lightgray}{rgb}{0.9,0.9,0.9}
+\definecolor{blue}{rgb}{0.0,0.0,0.9}
+\definecolor{orange}{rgb}{0.8,0.4,0.0}
+\definecolor{green}{rgb}{0.0,0.7,0.0}
+\definecolor{red}{rgb}{0.9,0.0,0.0}
+
+\usepackage{listings, lstautogobble}
+\lstset{%
+   language=[11]C++
+  ,frame=lines
+  ,numbers=left
+  ,numberstyle=\tiny\color{darkgray}
+  ,stepnumber=1
+  ,numbersep=5pt
+  ,backgroundcolor=\color{lightgray}
+  ,showspaces=false
+  ,keepspaces=true
+  ,autogobble=true 
+  ,breaklines=true
+  ,tabsize=2
+  , 
+  ,basicstyle=\footnotesize\ttfamily\color{black}
+  ,identifierstyle=\color{orange}
+  ,keywordstyle=[1]\color{blue}\textbf
+  ,keywordstyle=[2]\color{red}\textbf
+  ,stringstyle=\color{green}
+  ,commentstyle=\color{darkgray}\textit
+}
+  
+\usepackage{caption}
+\usepackage{colortbl}
+\definecolor{tabgrey}{rgb}{0.85,0.85,0.85}
+%using minted because of the hashtag in bash
+
+\sloppy
+\clubpenalty=10000
+\widowpenalty=10000
+\displaywidowpenalty=10000
+
+
+% set font 
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{times}
+
+\begin{document}
+
+\selectlanguage{ngerman}
+% ----------------------------------------------------------------------------
+% ---------------------------------------------------------- HIER WAS MACHEN -
+% -------------------------------- Metadaten wie namen und Gruppentreffen etc-
+\title{C++ Coding Style}
+\subtitle{LANKE}
+\date{\today}
+
+\publishers{%
+	\normalfont\normalsize%
+	\parbox{0.8\linewidth}{\centering
+		Um die Garantie zu geben, dass die Qualität des Quellcodes
+		eigehalten wird, ist eine Richtlinie für den Code zu schreiben,
+		unabdingbar. Auf Basis von den Codebeispielen der Professoren,
+		unseren Erfahrungen und allgemeinen Vereinbarungen in der 
+		Programmierer Szene ist hier für das Praktikum ESE eine solche 
+		Richtline erstellt worden.
+	}
+}
+
+\maketitle
+\setcounter{page}{1}
+\tableofcontents
+\flushleft
+
+\section{Einleitung}
+	Dieses Dokument legt die Konventionen für den Quellcode fest.
+	Zuerst wird das Sprachbild ( die Namensgebung, das Layout
+	und die Struktur im Code ) festgelegt. Danach wird über das
+	Dokumentieren gesprochen. Das Testen eines Modules wird abschließend
+	besprochen.
+	
+\section{C++ Sprachbild}
+\subsection{Namengebung}
+
+  \begin{minipage}[t]{0.45\linewidth}
+  Alle Namen sind Englisch. 
+  \begin{compactitem}
+  \item[\textbf{Typen:}] \textbf{C}amel\textbf{C}ase 
+    \begin{compactitem}
+    \item Klasse (class)
+    \item Struktur (struct)
+    \item Aufzählung (enum)
+      \begin{compactitem}
+      \item Singular (Status statt Stati)
+      \end{compactitem}
+    \item typedef
+    \end{compactitem}
+  \item[\textbf{Variablen:}] \textbf{c}amel\textbf{C}ase
+  \item[\textbf{private Attribute:}] \textbf{c}amel\textbf{C}ase
+  \begin{compactitem}
+    \item suffix\textbf{\_} 
+  \end{compactitem}  
+  \item[\textbf{Konstanten:}] \textbf{UPPER\_CASE} 
+  \item[\textbf{Funktionen:}] Verb + Nomen, \textbf{c}amel\textbf{C}ase 
+  \item[\textbf{Flags:}] \textbf{c}amel\textbf{C}ase
+    \begin{compactitem}
+    \item \textbf{is}Prefix, 
+    \item keine Negation 
+    \item > isRunning anstatt isNotRunning
+    \end{compactitem} 
+  \end{compactitem}
+  \end{minipage}%
+  \hfill
+  \begin{minipage}[t]{0.5\linewidth}
+    \begin{lstlisting}
+      #define UNIVERCITY_NAME "HAW Hamburg" 
+      class UniAccount
+      {
+        public:
+          Status getStatus(void) ;
+      
+        private:
+          Status status_ ;
+          bool isStudent_ ;
+      }
+      
+      enum Status 
+      {
+         STUDENT
+        ,PROF
+      }     
+    \end{lstlisting}
+  \end{minipage}%
+
+\subsection{Layout}
+\begin{minipage}[t]{0.45\linewidth}
+
+  \large{\textbf{white space}}\normalsize 
+  \begin{compactitem}
+    \item[\textbf{Einrückung:}] für jeden Block
+    \begin{compactitem}
+      \item Leerzeichen statt Tabs
+      \item 2 oder 3 Leerzeichen
+    \end{compactitem}
+    \item[\textbf{Zeilen zwischen...}]\textbf{:}
+    \begin{compactitem}
+      \item[Funktionen:] eine Leerzeile
+      \item[logische Aufteilung:] Zeilenkommentar statt Leerzeile
+    \end{compactitem}
+    \item[\textbf{Lesbarkeit:}] ist das oberste Ziel
+    \begin{compactitem}
+      \item \textbf{Klammern:} je nach Lesbarkeit 
+      \item \textbf{Operantionen:} zwischen Operanten 
+      und Operatoren ein Leerzeichen
+      \item \textbf{Listen:} hinter jedem Komma ein Leerzeichen 
+      (Ausnahme: wenn Liste unteinander geschrieben wird )
+      \item \textbf{Zuweisungen:} es dürfen mit Leerzeichen Tabellen gemimt werden.
+    \end{compactitem}
+  \end{compactitem}
+  
+  \large{\textbf{Blöcke}}\normalsize 
+  \begin{compactitem}
+  \item[\textbf{öffnende Blockklammer:}] $\{$
+  
+  \begin{compactitem}
+    \item \textbf{Typen:} in neuer Zeile
+    \item \textbf{Schleifen:} direkt dahinter oder neue Zeile
+    \item \textbf{Bedingungen:} direkt dahinter oder neue Zeile
+  \end{compactitem}
+  \item[\textbf{schließende Blockklammer:}] $\}$
+    \item in der Einrückebene, in der sie geöffnet wurden
+    \item sind einziges Zeichen in Zeile
+  \end{compactitem}
+  
+  \large{\textbf{Zeilenumbruch}}\normalsize 
+  \begin{compactitem}
+    \item[\textbf{Zeilenzeichenlimit:}] 80 Zeichen
+    \item[\textbf{Deklaration:}] je eine Zeile
+    \item wenn das Zeichenlimit pro Zeile nicht reicht...
+    \begin{compactitem}
+      \item \textbf{Parameter-/Argumentenliste:} wo die Klammer sich öffnet
+      \item \textbf{Zuweisung, Berechnung:} wo $=$ beginnt
+    \end{compactitem}
+  \end{compactitem}
+  \end{minipage}%
+  \hfill
+  \begin{minipage}[t]{0.5\linewidth}
+    \begin{lstlisting}
+      class UniAccount
+      {
+        public:
+          void work(int time){
+            // get infos 
+            int freeTime      = freeTime_ ;
+            Status motivation = getMotivation();
+            // test if she/he is capable to work
+            if (freeTime > time && motivation => OK){
+              workTime_ += time;
+              freeTime_ -= time;
+            }
+            return;
+          }
+        
+          int calcSomthing ( int a, int b, int c, 
+                             int d, int e, inf f 
+          ){
+            int thisReturnValueNameLong = a + b + c 
+                                        + d + e + f;
+            return thisReturnValueNameLong;    
+          }
+        
+        private:
+          workTime_ ;
+          freeTime_ ;
+      }
+      
+      enum Status
+      {
+         DEPRESSED
+        ,OK
+        ,MOTIVATED
+      } 
+      
+    \end{lstlisting}    
+  \end{minipage}%
+
+\section{Struktur}
+
+\begin{minipage}[t]{0.45\linewidth}
+  \begin{compactitem}
+    \item[\textbf{Module:}] Teile Implementation vom Interface
+    \begin{compactitem}
+      \item \textbf{Module.h:} Interface
+      \begin{compactitem}
+        \item verwende include guards (MODULE\_H\_)
+        \item Deklarationen
+        \item Templates
+        \item inline function Definitionen
+      \end{compactitem}
+      \item \textbf{Module.cpp:} Implementation
+       \begin{compactitem}
+        \item Funktionsdefinitionen
+        \item strikte innere Klassen
+      \end{compactitem}
+      \item \textbf{Ausnahme:} Eigene Bibliotheken sind in einem 
+        Header definiert.
+    \end{compactitem}
+    \item[\textbf{Weiteres:}] Was soll noch eingehalten werden.
+    \begin{compactitem}
+        \item keine magic numbers (lieber Konstanten)
+        \item vermeide namespaces
+        \item order of includes: most spacific first
+        \item wenn du einen Header nur im cpp file benötigst,
+        füge diesen auch nur dort ein
+        \item wenn möglich, verwende forward declaration
+        \item erstelle den Ctor
+        \item verwende RAII (Ressource hängt von Lebzeit des Objekts ab)
+        \item versuche die rule of three
+        \begin{compactitem}
+          \item Konstruktor und passender Destruktor  
+          \item Kopierkonstruktor
+          \item assigment operator
+        \end{compactitem}
+      \end{compactitem}
+  \end{compactitem}
+  \end{minipage}%
+  \hfill
+  \begin{minipage}[t]{0.5\linewidth}
+    Module.h
+    \begin{lstlisting}
+      #ifndef MODULE_H_
+      #define MODULE_H_
+      
+      class SomeClass;
+
+      class Module
+      {
+        public:
+          // rule of three
+          Module(SomeClass) ; // ctor
+          virtual ~Module() ; // destructor
+          Module(const Module&) ; // copy constructor
+          Module& operator= (const Module&); // assigment operator
+        
+          void printSomething(void) const;
+        
+        private:
+          SomeClass &handle_ ;
+      }
+      #endif /* MODULE_H_ */
+      
+    \end{lstlisting}    
+    Module.cpp
+    \begin{lstlisting}
+      #include "Module.h"
+      #include "SomeClass.h"
+      
+      #include <iostream>
+      
+      using namespace std;
+      
+      // RAII begin
+      Module::Module(SomeClass cl)
+      : handle_(cl)
+      {
+        //ctor
+      }
+      
+      Module::~Module(){
+        release (handle_);
+      }
+      // RAII end
+      
+      Module::printSomething(void){
+        cout << handle_->getSomthing() << endl;
+      }
+      
+    \end{lstlisting}  
+  \end{minipage}%
+
+\newpage
+\section{Dokumentation}
+	
+	\begin{minipage}[t]{0.45\linewidth}
+	  \large{\textbf{CODE DOKUMENTATION}}\newline
+	  \normalsize
+	  Die Dokumentation wird mit dOxygen erzeugt. Dafür wird mit Tags 
+		auf Informationen gesammelt.
+		DOxygen holt sich die Informationen aus 
+		nebenstehenden Kommentarstrukturen. Funktionen und Typen werden mit dem
+		Block erklärt. Variablen, Attribute und Konstanten werden mit
+		$/**< ... */$ beschrieben. Die Beschreibung erfolgt fast ausschließlich 
+		in der Headerdatei des Modules.
+		Erstellt wird die Dokumentation mit den Befehlen:
+		\begin{lstlisting}
+    $ doxygen <config-file>
+		\end{lstlisting}
+		
+  \end{minipage}%
+  \hfill
+  \begin{minipage}[t]{0.5\linewidth}
+    \begin{lstlisting}
+    
+    /** @file <filename>
+     *  @brief <short description of module>
+     *
+     *  <detailes, longer explaination, pattern, componente>
+     *  @author <author 1>
+     *  @author <author 2>
+     */
+     
+    /**
+     * @class <description of class>
+     */
+    class Module
+     { 
+     ...
+		/** 
+		 *  @details description of function
+		 *  @param a <description of 1st parameter>
+		 *  @param b 
+		 *      <description of 2nd parameter>
+		 *  @return <description of retrunvalue>
+		 */
+		int  func(int a, int b);
+
+		/// single line 
+		
+		int x_; /**< decription of x */
+		\end{lstlisting}
+  \end{minipage}%
+	
+		
+		Die verwendetet Tags für dieses Projekt sind:
+		\begin{table}[H]
+			\begin{tabular}{|p{0.15\textwidth}|p{0.5\textwidth}|}
+			\hline
+			\rowcolor{lightgray}
+			\textbf{tag}  & \textbf{Rendering} \\ \hline
+			
+			@file        & Name des Files                                  \\ \hline
+			@brief       & kurze Beschreibung des Moduls                   \\ \hline
+			@author      & Name des Authors                                \\ \hline
+			@class \newline
+			@enum \newline
+			@struct       & Beschreibung des Typen                         \\ \hline
+			@details     & kurze Beschreibung der Funktion                 \\ \hline
+			@param <par> & Beschreibung des Parameters <par> in Funktionen \\ \hline
+			@return      & Beschreibung des Rückgabewertes                 \\ \hline
+			
+			\end{tabular}
+		\end{table} 
+		
+		
+	\begin{minipage}[t]{0.45\linewidth}
+	  \large\textbf{LIZENZ}\newline \normalsize
+		Unser Project läuft unter der MIT Lizenz, welche in der Textdatei 
+		\texttt{LICENSE.txt} beschrieben ist. Jedes File muss den folgenden
+		Text im header haben.
+		
+  \end{minipage}%
+  \hfill
+  \begin{minipage}[t]{0.5\linewidth}
+    \begin{lstlisting}
+        /**
+         *   ...
+         *  Embedded System Engineering SoSe 2017
+         *  Copyright (c) 2017  LANKE devs
+         *  This software is licensed by MIT License.
+         *  See LICENSE.txt for details.
+         */
+		\end{lstlisting}
+  \end{minipage}%
+  
+\section{Testen}
+
+Wie ein Unittest aussieht, ist jedem Entwickler freigestellt. Er hat 
+somit die alleinige Verantwortung, dass sein Code richtig funktioniert. 
+Die Testfiles müssen in dem Unterverzeichnis \texttt{test} abgelegt werden,
+und sollten im Team veröffentlicht werden. 
+Die Tests sollten alle Ausnahmefälle und die Funktion des Modules Testen.
+Eventuell werden auch mehrere Komponenten gleichzeitig getestet. 
+Bevor es an die Hardware geht, sollte der Code in Software reibungslos
+laufen.
+
+Mögliche Testwerkzeuge sind einmal ein Testmodul mit Mainfunktion oder 
+man verwedet C++Unit.  
+
+\section*{kurze Empfehlungen}
+Wenn Pattern verwendet werden, sollten die Namen der Pattern bzw. 
+deren Komponenten in den Namen der Klassen wiederzufinden sein. 
+
+
+\end{document}

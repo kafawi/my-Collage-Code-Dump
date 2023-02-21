@@ -1,0 +1,9 @@
+# ignore tmp files
+*~
+*.~
+*.swp
+.*.swp
+# ignore python
+*/__pycache__/*
+*/.idea/*
+

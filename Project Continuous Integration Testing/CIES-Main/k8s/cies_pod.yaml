@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cies-pod
+  namespace: cies
+spec:
+  containers:
+    - name: cies-co
+      image: nexus.informatik.haw-hamburg.de/cies-main
+      volumeMounts:
+        - mountPath: "/mnt/cies-vol/_data"
+          name: data-pv
+      #ports:
+       # - containerPort: 80
+       #   name: "http-server"
+  volumes:
+    - name: data-pv
+      persistentVolumeClaim:
+          claimName: data-pv-claim

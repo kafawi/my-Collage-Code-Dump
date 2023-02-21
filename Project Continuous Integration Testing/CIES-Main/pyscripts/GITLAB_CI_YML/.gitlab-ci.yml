@@ -1,0 +1,51 @@
+variables:
+  DOCKER_REGISTRY: "nexus.informatik.haw-hamburg.de"
+  DO_LINUX_ANAYLYSE_NAME: "cies-linux-analyse"
+  # Testrepro
+  DO_VERSION: "stable"
+  PYSCRIPT_PATH: "/mnt/cies-vol/pyscripts/"
+  #CUSTOMER_ID: ""
+  #CDR_ID: "1045"
+  #CDR_NAME: ""
+  #CDR_URL: ""
+
+stages:
+  - analyze
+  - deliver
+
+static_analysis:
+  stage: analyze
+  image: $DOCKER_REGISTRY/$DO_LINUX_ANAYLYSE_NAME:$DO_VERSION
+  # later: need a variable for the branch name
+  #        to checkout to the right branch
+  #        make for all branches one webhook
+#  only:
+#    - webhook
+  script:
+    # pull/clone git with source code
+    - mkdir /PROJECT/
+    - cd /PROJECT/
+    #- get_TCDR and go inside
+    - git clone "https://oauth2:"$gitlabtoken"@"$CDR_URL".git"
+    #- git clone "https://oauth2:"$ACCESS_TOKEN"@"$CDR_URL".git"
+    - cd $CDR_NAME
+    # - git checkout specific_branch
+    - GIT_SHA=$(git rev-parse HEAD)
+    - cd $PYSCRIPT_PATH
+    - python3 script_generator.py -a $CDR_ID
+    # generate report.json
+    - bash ./analyze.sh
+    - python3 store_report.py report.json $GIT_SHA $CI_PIPELINE_ID $CDR_ID
+
+# send report to customer
+delivery:
+  stage: deliver
+  image: $DOCKER_REGISTRY/$DO_LINUX_ANAYLYSE_NAME:$DO_VERSION
+#  only:
+#    - webhook
+  script:
+    - cd $PYSCRIPT_PATH
+    - python3 script_generator.py -r $USER_MAIL $CDR_ID $CI_PIPELINE_ID 
+    #- python3 script_generator.py -r $CUSTOMER_ID $CDR_ID $CI_PIPELINE_ID 
+    - bash ./report-delivery.sh
+#

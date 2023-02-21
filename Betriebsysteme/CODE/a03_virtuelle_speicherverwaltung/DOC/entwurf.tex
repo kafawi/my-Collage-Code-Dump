@@ -1,0 +1,245 @@
+% PROTOKOLL BSP 02
+\documentclass[
+   draft=false
+  ,paper=a4
+  ,twoside=false
+  ,fontsize=11pt
+  ,headsepline
+  ,BCOR10mm
+  ,DIV11
+  ,parskip=full+
+]{scrartcl} % copied from Thesis Template from HAW
+
+\usepackage[ngerman,english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage[german,refpage]{nomencl}
+
+\usepackage{float}
+\usepackage{enumitem}
+\usepackage{hyperref} % for a better experience
+
+\hypersetup{
+   colorlinks=true % if false - links get colored frames
+  ,linkcolor=black % color of tex intern links
+  ,urlcolor=blue   % color of url links
+}
+
+\usepackage{amsmath}
+
+\usepackage{array}   % for \newcolumntype macro
+\newcolumntype{L}{>{$}l<{$}} % math-mode version of "l" column type
+\newcolumntype{R}{>{$}r<{$}} % math-mode version of "r" column type
+\newcolumntype{C}{>{$}c<{$}} % math-mode version of "c" column type
+
+%\usepackage{listing}
+\usepackage{caption}
+%\usepackage{xcolor}
+%\definecolor{bg}{rgb}{0.60,0.95,0.95}
+%using minted because of the hashtag in bash
+\usepackage{minted}
+% c listing
+\newminted{c}{fontsize=\small
+             ,fontfamily=tt
+             ,linenos
+             ,frame=single
+             } % \begin{ccode} ... \end{ccode}
+\newmintedfile{c}{fontsize=\small
+                 ,fontfamily=tt
+                 ,linenos
+                 ,frame=single
+                 ,autogobble
+                 } % \cfile{}
+% Makefile listing
+\newminted{make}{fontsize=\small
+             ,fontfamily=tt
+             ,linenos
+             ,frame=single
+             }  % \begin{makecode} ... \end{makecode}
+\newmintedfile{make}{fontsize=\small
+                    ,fontfamily=tt
+                    ,linenos
+                    ,frame=single
+                    ,autogobble
+                    } % \makefile{}
+\sloppy
+\clubpenalty=10000
+\widowpenalty=10000
+\displaywidowpenalty=10000
+
+\begin{document}
+
+\selectlanguage{ngerman}
+\usemintedstyle{emacs}
+% ----------------------------------------------------------------------------
+% Titel (erst nach \begin{document}, damit babel bereits voll aktiv ist:
+\titlehead{Betriebssysteme WS 2016 Praktikum 03}% optional
+\subject{BS Praktikumsaufgabe 03}
+\title{Virtuelle Speicherverwaltung}
+\subtitle{Version 0.1 - Abgabe am 28. November 2016 16:00}
+\author{Alexander Mendel \\ Karl-Fabian Witte}
+\date{erstellt am \today}% sinnvoll
+%\publishers{Platz für Betreuer o.\,ä.}% optional
+% ----------------------------------------------------------------------------
+\maketitle% verwendet die zuvor gemachte Angaben zur Gestaltung eines Titels
+\begin{abstract}
+    Der Mechanismus des virtuellen Pagings wird nachgebildet und
+    mit den Algorithmen \textbf{FIFO}, \textbf{CLOCK} und \textbf{LRU} 
+    getestet. Dabei ist die Datei 
+    \emph{pagefile.bin} der Festplattenersatz. Der physikalische Speicher 
+    wird als
+    "{}Shared Memory"{} abgebildet. Anstelle von Interrupts werden
+    Signale verwendet. Ein Quellcodegerüst wurde uns vorab zur 
+    Verfügung gestellt, welches einige Objekte im Vorhinein definiert. 
+    \end{abstract}
+\tableofcontents
+% ----------------------------------------------------------------------------
+\flushleft
+\section{Entwurf}
+Im Großen und Ganzen werden die Funktionsköpfe und Definitionen, welche 
+uns gegeben wurden, beibehalten und damit das Vorhaben realisiert. Nur kleine
+Änderungen haben wir uns erlaubt. 
+
+    \subsection{Grundgerüst}
+        Die Simulation besteht aus 2 Prozessen, die sich einen gemeinsamen 
+        Speicherbereich teilen. Es wird zunächst \texttt{mmanage} aufgerufen. 
+        Dieser Prozess legt den gemeinsamen Speicher fest und verwaltet. Zudem 
+        legt er auch den SWAP bzw. Auslagerung auf der Festplatte an und 
+        verwaltet diesen als einziger. Nachdem \texttt{mmanage} alles 
+        initialisiert hat, wartet er auf ein Signal, damit er unter anderem 
+        die page fault routine \texttt{allocate\_page()} ausführen kann, worin 
+        er den nächsten Pageslot aussucht, ggf. die Daten der alten page ins 
+        \texttt{pagefile.bin} schreibt, den frame der benötigten page holt 
+        und die daten als page in den gemeinsamen Speicherbereich schreibt. Danach
+        wird der \texttt{vmappl} wieder frei gegeben.
+        
+        \texttt{vmappl} sortiert Daten und interagiert mit dem gemeinsamen 
+        Speicher, der viel zu klein ist, um alle Daten zu halten. Wenn die 
+        gewünschte Seite zum Lesen bzw. Schreiben nicht im gemeinsamen 
+        Speicher liegt, haben wir einen \textit{page fault} und ein Signal 
+        wird an \texttt{mmanage} geschickt und \texttt{vmappl} blockiert sich
+        selbst.
+
+    \subsection{Schlüsselobjekte}
+
+        \subsubsection{Datei statt Festplatte}
+        Anstelle des gesonderten Festplattenbereiches, auf der die 
+        auszulagernden Daten gespeichert werden, erstellen wir mit \texttt{fopen()}
+        eine Dateien, aus der wir bei einem page fault die gewünschte Daten 
+        in den RAM-Ersatz lesen und ggf. (dirty) Daten vom RAM Ersatz in die 
+        Datei schreiben. Dabei wird die Datei mit sehr großen Zahlen initalisiert
+        $( 0 \leq x \leq RAND_MAX = 2^{32}-1 \widehat{=} \mathcal{O}(10^{10}))$.
+        Da im Anwendungsprogramm \texttt{vmappl} nur Zahlen erzeugt werden, 
+        die kleiner sind als 1000, kann man so erkennen, bis wohin unser 
+        \texttt{mmanage} die neuen Daten auslagert. Wir verwenden ein festes 
+        Format, mit der wir die Daten in die Datei schreiben ("{}\%10d"{} + 
+        Delimiter). Zwei Funktionen in \texttt{mmanage} greifen auf diese
+        Datei direkt zu: 
+        \begin{itemize}
+                \item[\texttt{fetch\_page()}:] greift lesend auf die Datei zu,
+                indem der Positionszeiger der Datei mit \texttt{fseek()} 
+                gesetzt wird und mit \texttt{fscanf()} von dieser Position an 
+                gelesen wird.
+                \item[\texttt{store\_page()}:] greift schreibend auf die Datei zu,
+                indem der Positionszeiger der Datei mit \texttt{fseek()} 
+                gesetzt wird und mit \texttt{fprintf()} von dieser Position an
+                beschrieben wird.
+        \end{itemize}
+
+        \subsubsection{Shared Memory statt RAM}
+        Der Arbeitsspeicher wird mit einem Prozess übergreifenden 
+        Speicherbereich (Shared Memory) simuliert.
+        Wir verwenden die ältere System V Form. Dabei gehen wir wie folgt vor.
+        \texttt{vmem\_init} erstellt den gemeinsamen Speicher mit 
+        \texttt{shmget()}, wobei IPC\_CREATE mit als Argument übergeben wird,
+        mit dem der Speicherbereich alloziert wird. Mit der erhaltenden ID 
+        erhält man durch \texttt{shmat()} einen Zeiger auf den Bereich, welcher
+        zu der Struktur aus \texttt{vmem.h} gecastet wird. 
+        In \texttt{vmmacces.c : vm\_init()} funktioniert das ähnlich , jedoch 
+        wird hier der IPC\_CREATE nicht übergeben. Damit beide Prozesse den 
+        selben Speicherbereich erhalten, wird \texttt{shmget()} der selbe 
+        key SHMNAME übergeben.
+        Die Zerstörung des Shared Memory erfolgt in \texttt{clean\_up()} in 
+        \texttt{mmanage}. Hier wird \texttt{shmdt} zum Lösen und danach 
+        \texttt{shmctl()} mit IPC\_RMID  zum Zerstören aufgerufen.
+        
+        Der Inhalt der \texttt{vmem} Structur wird in 
+        \texttt{mmanage: vemm\_init()} gefüllt. Es wird zuerst alles auf 
+        default Werte bzw. VOID\_IDX gesetzt. Auch die Prozess ID von 
+        \texttt{mmanage} wird in dieser gespeichert, damit \texttt{vmappl} bei 
+        einem Seitenfehler ein Signal an \texttt{mmanage} schicken kann.
+        Der Semaphor zum blocken von \texttt{vmappl} wird ebenfalls dort 
+        erstellt.
+
+        \subsubsection{Signal statt Interrupts}
+        Ein Betriebssystem operiert bei \textit{page faults} mit Interrupts. Wir
+        operieren hingegen mit Signalen. Bei einem \textit{page fault} schickt
+        der \texttt{vmappl} Prozess über \texttt{vmaccess} Funktionen bei einem
+        \textit{page fault} (PRESENT\_FLAG ist nicht gesetzt -> Seite ist nicht
+        im Speicher (vmem)) ein Signal (SIGUSR1) an den \texttt{mmanage} Prozess und 
+        blockiert sich selber.  
+        Dieser reagiert mit \texttt{sighandler()} und ruft die Funktion
+        \texttt{allocate\_page()} auf, welches die geforderte Seite in den 
+        Speicher lädt.
+
+        Mit dem Signal SIGINT wird \texttt{mmanage} nach dem Zerstören des
+        \textit{Shared Memory} durch \texttt{clean\_up()} das Programm beendet.
+        Ein weiteres Signal (SIGUSR2) ruft die Funktion \texttt{dump\_pt()}
+        auf, welches die Seitentabelle einmal auflistet. Das nutzt uns für das
+        Debugging. 
+        
+        \subsubsection{\texttt{vmem\_read} und \texttt{vmem\_write}}
+        Zuerst wird überprüft, ob der Speicher schon bekannt ist und ggf.  bekannt gemacht. \texttt{vmappl} ruft nämlich nicht direkt
+        die Funktion \texttt{vm\_init} auf.
+        \texttt{vmappl} nimmt aus der quasie Bibliothek \texttt{vmaccess} die 
+        Funktionen \texttt{vmem\_read(address)} und \texttt{vmem\_write(address)}.
+        Da \texttt{address} eine volle virtuelle Adresse ist, muss ein 
+        Seitenindex aus dieser errechnet werden. Dies erfolgt mit der 
+        Ganzzahldivision mit der Seitengröße des Speichers VMEM\_PAGESIZE.
+        Der Offset wird ähnlich wie der des Seitenindexes berechnet, jedoch mit
+        Modulo statt Division.
+
+        Es wird geprüft, ob die Seite schon im Speicher liegt, wenn nicht wird 
+        ein Signal gesendet und blockiert (page fault). Nun ist die Seite zum
+        Lesen bzw. Schreiben verfügbar. Beim Schreiben wird das DIRTY\_FLAG 
+        gesetzt. Beim Lesen und Schreiben wird das USED\_FLAG gesetzt (und für
+        LRU wichtig, der jeweilige counter auf 0 gesetzt.)
+
+        Nachdem die Seite nun geladen ist, wird noch der Offset an den 
+        Seitenindex angehängt und zurückgegeben. 
+        
+    \subsection{Algorithmen}
+    Welche Seite ersetzt werden soll, entscheidet der Seitenersetzungsalgorithmus.
+    Die Adresse der jeweiligen Seitenersetzungsfunktion wird bei der Algorithmusabfrage mit getopt einem Funktionszeiger übergeben.
+        \subsubsection{FIFO}
+        Der Fifo ist der einfachste und kann mit einer Zeile Code realisiert werden.
+        Dabei wird einfach der \texttt{next\_alloc\_idx} um einen erhöht 
+        und das Modulo mit der Rahmenanzahl VMEM\_NFRAMES gebildet. Wie ein Ringbuffer.
+
+        \subsubsection{CLOCK}
+        Dieser ist dem Fifo relativ ähnlich. Dabei wird ein Zeiger (eigentlich 
+        ein Index) wie der Fifo berechnet, jedoch wird mit der page, welche 
+        daraus resultiert, das USED\_FLAG geprüft. Wenn es gesetzt ist, wird es
+        gelöscht, solange bis der Zeiger auf eine Seite zeigt, die ein 
+        gelöschtes USED\_FLAG besitzt und somit raus geworfen wird.
+
+        \subsubsection{LRU}
+        Als pseudo Zeit wird ein page counter verwendet, der in jeder page 
+        erhöht wird, wenn ein Schreibe- oder Lesezugriff erfolgt. 
+        Der Zähler der benutzten Seite wird auf Null gesetzt. 
+        Der Algorithmus selber sucht alle Seiten einmal ab und speichert die 
+        Seite mit dem größten Zählerstand und gibt diesen zurück.
+
+
+    \subsection{Sonstiges}
+        Die Auswahl der Algorithmen wird mittels der getopt Funktion von GNU 
+        realisiert. Wie das genau aussehen wird, ist noch nicht entschieden.
+        Alle missglückten Systemaufrufe führen zum Absturz.
+\section{How to compile - Makefile}
+     Da wir zwei Prograimme übersetzten werden, werden die Linkeranweisungen 
+     aufgeteilt. Mit dem Befehl make all bzw. run\_all werden alle Programme 
+     erstellt bzw. ausgeführt.
+%\section{Quellcode}
+
+\end{document}

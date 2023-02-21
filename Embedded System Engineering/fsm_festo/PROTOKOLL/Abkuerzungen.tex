@@ -1,0 +1,57 @@
+\documentclass[10pt]{article}
+%Gummi|065|=)
+
+\usepackage[ngerman,english]{babel}
+%% see http://www.tex.ac.uk/cgi-bin/texfaq2html?label=uselmfonts
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+%\usepackage[latin1]{inputenc}
+\usepackage{libertine}
+\usepackage{pifont}
+\usepackage{microtype}
+\usepackage{textcomp}
+\usepackage[german,refpage]{nomencl}
+\usepackage{setspace}
+\usepackage{makeidx}
+\usepackage{listings}
+
+
+\usepackage{longtable}
+\usepackage{enumitem}
+\usepackage[hyphens]{url}
+\urlstyle{same}
+\title{\textbf{Begriffsglossar ESE-Projektaufgabe}}
+\author{Nils Eggebrecht\\
+		Lennart Hartmann\\
+		Alexander Mendel\\
+		Eduard Veit\\
+		Karl-Fabian Witte}
+\date{[30. März 2017]}
+
+\begin{document}
+
+\newenvironment{sourceenum}{
+  \vspace{-\baselineskip}
+    \begin{enumerate}[leftmargin=*,noitemsep,topsep=0pt,partopsep=0pt]}
+   {\end{enumerate}}
+\maketitle
+\texttt {Dieses Dokument ist vorerst Abgeschlossen. Es werden keine Änderungen benötigt.}
+\section{Glossar}
+
+\begin{longtable}{|p{0.2\textwidth} p{0.9\textwidth} |}
+	\hline
+	\textbf{Begriff} & \textbf{Erläuterung} \\ [5pt]
+	\hline
+	\endhead
+	\hline 
+	\endfoot
+	
+
+\\ \hline
+	EntryManager &
+	Dies ist der Zustandsautomat, der die erste Lichtschranke behandelt. Zustände sind \newline\textbf{Ready}: \newline  Es findet eine Transition statt, wenn die Methode ReportNewPuk im Inputmultiplexer aufgerufen wird. Daraufhin wird ein Puk in der Liste angelegt
+\\ \hline
+
+\end{longtable}
+\end{document}
+\grid

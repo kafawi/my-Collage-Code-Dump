@@ -1,0 +1,120 @@
+\documentclass[10pt]{article}
+%Gummi|065|=)
+
+\usepackage[ngerman,english]{babel}
+%% see http://www.tex.ac.uk/cgi-bin/texfaq2html?label=uselmfonts
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+%\usepackage[latin1]{inputenc}
+\usepackage{libertine}
+\usepackage{pifont}
+\usepackage{microtype}
+\usepackage{textcomp}
+\usepackage[german,refpage]{nomencl}
+\usepackage{setspace}
+\usepackage{makeidx}
+\usepackage{listings}
+
+
+\usepackage{longtable}
+\usepackage{enumitem}
+\usepackage[hyphens]{url}
+\urlstyle{same}
+\title{\textbf{Begriffsglossar ESE-Projektaufgabe}}
+\author{Nils Eggebrecht\\
+		Lennart Hartmann\\
+		Alexander Mendel\\
+		Eduard Veit\\
+		Karl-Fabian Witte}
+\date{[30. März 2017]}
+
+\begin{document}
+
+\newenvironment{sourceenum}{
+  \vspace{-\baselineskip}
+    \begin{enumerate}[leftmargin=*,noitemsep,topsep=0pt,partopsep=0pt]}
+   {\end{enumerate}}
+\maketitle
+\texttt {Dieses Dokument ist vorerst Abgeschlossen. Es werden keine Änderungen benötigt.}
+\section{Glossar}
+
+\begin{longtable}{|p{0.2\textwidth} p{0.5\textwidth} p{0.3\textwidth}|}
+	\hline
+	\textbf{Begriff} & \textbf{Erläuterung} & \textbf{Quellen} \\ [5pt]
+	\hline
+	\endhead
+	\hline 
+	\endfoot
+	
+	Artefekte &
+	 Artefakte eines Softwareprojekts bezeichnet man als Arbeitsereignisse (Work Products). Dazu gehören nicht nur Arbeitsschritte der Softwareimplementierung, sondern auch Vorarbeiten (Vorbereitung der Architektur, des Designs) und kleine Milestones, die zum Erreichen des Ziels erforderlich sind. Ein Artefakt kann in Form eines Dokuments, Models (Use-Case), Element eines Modells festgehalten werden, so dass jedes Teammitglied ständig Informationen zur Planung des Projekts abrufen kann.
+	 & 
+	\begin{sourceenum}
+
+		\item \url{https://blog.flavia-it.de/artefakte-in-softwareprojekten/} [30. März 2017, 9:30]
+		
+	\end{sourceenum}
+\\	\hline
+	
+
+STL Threads &
+		STL (Standard Template Library) ist ein Paket von Template-Klassen (z. B. data structures: vetors, lists, queues und stacks). 
+		Kategorien: 
+		\begin{itemize}
+		\item I/O
+		\item String and character handling
+		\item Mathematical
+		\item Time, date, and localization
+		\item Dynamic allocation
+		\item Miscellanous
+		\item Wide-character functions
+		\end{itemize}
+		
+		Die Threadklasse (std::thread) repräsentiert ausführbare Threads und Multithreading im gleichen Adressspace. (Joinable)
+		 & 
+	\begin{sourceenum}
+
+		\item \url {https://www.tutorialspoint.com/cplusplus/cpp_standard_library.htm} [30. März 2017, 9:30]
+		\item \url {http://www.cplusplus.com/reference/thread/thread/} [30. März 2017, 9:31]
+		
+	\end{sourceenum}
+\\	\hline
+
+	HAL &
+    Der	HAL (Hardware Abstraction Layer) ist eine logische Zwischenschicht im Betriebssystem. Sie vereinfacht die Übertragung zwischen Betriebssystem und kapselt die Eigenschaften der Zielplattform (MMU, Memory, Times, Port/Devices...). Die HAL abstrahiert Eigenschaften einer Plattform zu einer Programmierschnittstelle (API), wodurch die Architekturen der Plattformen gleich aussehen. Bei Hardwareänderung muss also nur die HAL-Schicht verändert werden. Die Funktion eines HAL gibt es nicht nur bei Betriebssystemen, sondern auch dort, wo Schichten einer Systemarchitektur voneinander getrennt werden müssen.
+	
+	 & 
+	\begin{sourceenum}
+
+		\item \url {http://www.itwissen.info/Hardware-Abstraktionsschicht-hardware-abstraction-layer-HAL.html} [30. März 2017, 9:30]
+		
+	\end{sourceenum}
+
+\\	\hline
+	
+	Petri-Netze &
+Ein Petri-Netz (auch Stellen-/Transitions-Netz) ist eine Art einer Modellierung von Abläufen mit nebenläufigen Prozessen mit kausalen Beziehungen.
+\newline Knoten repräsentieren Bedingungen, Zustände, Aktivitäten, die Knotenmarkierung repräsentiert den veränderlichen Zustand des Systems.
+\newline Kanten verbinden Knoten mit Vor- und Nachbedingung.
+\newline Die Anwendung umfasst unter anderen die Modellierung von realen oder abstrakten Automaten und Maschinen, oder auch Verhalten von Hardware-Komponenten.
+\newline (Detailliertere Informationen unter dem Quell-Link)
+
+	&
+	
+	\begin{sourceenum}
+		\item \url{http://www2.cs.uni-paderborn.de/cs/ag-hauenschild/lehre/WS06_07/modellierung/download/mod620.pdf} [30. März 2017, 9:30]
+\end{sourceenum}
+
+\\ \hline
+	UML &
+	Die (Unified Modeling Language) ist eine standardisierte grafische Sprach für Modelle von Systemen und insbesondere von Software-Teilen zur Dokumentation, Konstruktion und Spezifikation. Sprich: In Diagrammen werden Zusammenhänge zwischen Softwareteilen o.Ä. mithilfe der Sprechelemente dargestellt. &
+\begin{sourceenum}
+	\item \url{http://www.torsten-horn.de/techdocs/uml.htm} [17. April 2016, 11:30]
+\item \url{http://www.itwissen.info/definition/lexikon/unified-modelling-language-UML.html}  [17. April 2016, 11:30]
+\item \url{https://de.wikipedia.org/wiki/Unified_Modeling_Language} [17. April 2016, 11:00]
+\end{sourceenum}
+\\ \hline
+
+\end{longtable}
+\end{document}
+\grid

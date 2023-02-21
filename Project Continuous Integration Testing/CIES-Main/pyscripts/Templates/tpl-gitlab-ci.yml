@@ -1,0 +1,101 @@
+variables:
+  DOCKER_REGISTRY: "nexus.informatik.haw-hamburg.de"
+  DO_DEFAULT: "cies-default"
+  DO_SEND_REPORT: "cies-send-report"
+  DO_LINUX_ANAYLYSE: "cies-linux-analyse"
+  # Testrepro?
+  {% if p.CDR_ID == 1044 -%}
+  DO_VERSION: "latest"
+  {%- else -%}
+  DO_VERSION: "stable"
+  {%- endif %}
+  PYSCRIPT_PATH: "/mnt/pyscripts"
+
+stages:
+  - setup
+  - analyze
+  - store_and_deliver
+
+job:setup:
+  stage: setup
+  image: $DOCKER_REGISTRY/$DO_DEFAULT:$DO_VERSION
+  artifacts:
+    name: ${CI_PIPELINE_ID}
+    untracked: true
+    paths:
+      - ./PROJECT/
+      - ./gitsha.txt
+      - ./REPORT/
+      - ./SCRIPT/
+    when: on_success
+    expire_in: 2 hrs
+  before_script:
+  # setup SSH if on ubuntu
+    - pwd
+    - ls -la /
+    - ls -la /mnt/
+    - echo $PYSCRIPT_PATH
+    - ls -la $PYSCRIPT_PATH
+    - eval $(bash $PYSCRIPT_PATH/setup_ssh.sh "${SSH_KEY_CLONE_CDR}")
+  script:
+    - mkdir REPORT
+    - mkdir SCRIPT
+    - git clone git@gitlab.informatik.haw-hamburg.de:CIES/TCDR.git ./PROJECT
+    - cd PROJECT
+    - GIT_SHA=$(git rev-parse HEAD)
+    - echo $GIT_SHA > gitsha.txt
+    - PROJECTROOT=$(echo $PWD)
+    - python3 $PYSCRIPT_PATH/init_report.py $CDR_ID $CI_PIPELINE_ID $GIT_SHA
+    - cd ../SCRIPT
+    # #checkout to registered branch ->
+    # #if report doesnt exist, this ist the branch to analyze
+    # #if all registerd branches got a report already -> let the pipeline fail, nothing to do
+    # create empty report
+    # make anayse scripts and store them in architectures
+    - python3 $PYSCRIPT_PATH/script_generator.py -a $CDR_ID $PROJECTROOT
+
+
+analysis:static:
+  stage: analyze
+  image: $DOCKER_REGISTRY/$DO_LINUX_ANAYLYSE:$DO_VERSION
+  artifacts:
+    name: ${CI_PIPELINE_ID}
+    untracked: true
+    paths:
+      - ./REPORT/
+    when: on_success
+    expire_in: 2 hrs
+  script:
+    - bash ./SCRIPT/$CI_JOB_NAME.sh
+  after_script:
+    - mv ./report.json ./REPORT/$CI_JOB_NAME.json
+    #- python3 store_report.py report.json $GIT_SHA $CI_PIPELINE_ID $CDR_ID
+
+
+analysis:gitsha_pipe:
+  stage: analyze
+  image: $DOCKER_REGISTRY/$DO_DEFAULT:$DO_VERSION
+  artifacts:
+    name: ${CI_PIPELINE_ID}
+    untracked: true
+    paths:
+      - ./gitsha.txt
+    when: on_success
+    expire_in: 2 hrs
+  script:
+    - cat ./gitsha.txt
+
+# store reports ind DB and send report to customer
+job:store_and_delivery:
+  stage: store_and_deliver
+  image: $DOCKER_REGISTRY/$DO_SEND_REPORT:$DO_VERSION
+#  only:
+#    - webhook
+  before_script:
+    - GIT_SHA =$(cat gitsha)
+  script:
+    - python3 $PYSCRIPT_PATH/store_reports.py $CDR_ID $CI_PIPELINE_ID $GIT_SHA "./REPORT"
+    - python3 $PYSCRIPT_PATH/script_generator.py -r $CDR_ID $CI_PIPELINE_ID
+    #- python3 script_generator.py -r $CUSTOMER_ID $CDR_ID $CI_PIPELINE_ID
+    - bash ./report-delivery.sh
+#

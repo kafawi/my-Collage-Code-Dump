@@ -1,0 +1,40 @@
+# tmp
+.*~
+*~
+
+## latex
+*.aux
+*.log
+*.toc
+
+*.lof
+*.lot
+*.lol
+
+*.out
+*.ps
+*.dvi
+
+_minted*
+*_latexmk  
+*.fls
+
+*.pdf
+
+# archiv
+*.tar.gz
+
+# cfiles
+*.o
+
+Module.symvers
+modules.order
+*.ko
+*.mod.*
+.*.cmd
+/*/.tmp_versions/*
+*.gch
+
+# executive file
+# Not the task pdf
+!bsp4.pdf

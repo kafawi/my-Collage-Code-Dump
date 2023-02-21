@@ -1,0 +1,43 @@
+
+#<type>(<scope>): <subject>
+#-------------------------------------- max 50 ->|
+
+#<body>
+#------------------------------------------------------ line max: 72 ->|
+
+#<footer>
+#------------------------------------------------------ line max: 72 ->|
+
+# -------------------------------------------- END OF COMMIT MESSAGE ->|
+# <type>(<scope>): <subject>
+# \blank line
+# <body>
+# \blank line
+# <footer>
+# ---------------------------------------------------------------------|
+# __<type>__
+# - docs  ( changes in documentation )
+# - feat  ( new feature: general production code change )
+# - test  ( adding tests: no production code change )
+# - refac ( refactor production code: )
+# - fix   ( bug fix )
+# - style ( formatting style: adding comments etc )
+# __<scope>__
+# - layer, module or file, can be omitet
+# - are more files effected, use [*], and list them in body 
+# 
+# __<subject>__
+# - If applied, this commit will... 
+# - Capitalize the subject and no period [.] at end!
+# - Use imperative and present
+#
+# --- body with limps
+# __<body>__
+# - Why this change is being made?
+# - Use imperative and present (change, not changed )
+# - list of changed files with [-] as items (optional)
+#
+# __<footer>__
+# - References (tickets) to fixed bug, articels etc.  fix bug #120 
+# - BREAKING CHANGE: explain it short. 
+# ---------------------------------------------------------------------|

@@ -1,0 +1,154 @@
+% PROTOKOLL Action Item
+\documentclass[
+   draft=false
+  ,paper=a4
+  ,twoside=false
+  ,fontsize=11pt
+  ,headsepline
+  ,DIV11
+  ,parskip=full+
+]{scrartcl} % copied from Thesis Template from HAW
+
+\usepackage[ngerman,english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage[
+    left  =4em
+   ,right =4em
+   ,top   =5em
+   ,bottom=5em
+]{geometry}
+
+\usepackage{longtable}
+\usepackage[german,refpage]{nomencl}
+
+\usepackage{float}
+\usepackage{enumitem}
+\usepackage{hyperref} % for a better experience
+
+\hypersetup{
+   colorlinks=true % if false - links get colored frames
+  ,linkcolor=black % color of tex intern links
+  ,urlcolor=blue   % color of url links
+}
+
+\usepackage{amsmath}
+
+\usepackage{array}   % for \newcolumntype macro
+\newcolumntype{L}{>{$}l<{$}} % math-mode version of "l" column type
+\newcolumntype{R}{>{$}r<{$}} % math-mode version of "r" column type
+\newcolumntype{C}{>{$}c<{$}} % math-mode version of "c" column type
+
+\usepackage{listing}
+\usepackage{caption}
+\usepackage{colortbl}
+\definecolor{tabgrey}{rgb}{0.85,0.85,0.85}
+%using minted because of the hashtag in bash
+
+\sloppy
+\clubpenalty=10000
+\widowpenalty=10000
+\displaywidowpenalty=10000
+
+\begin{document}
+
+\selectlanguage{ngerman}
+% ----------------------------------------------------------------------------
+% ---------------------------------------------------------- HIER WAS MACHEN -
+% -------------------------------- Metadaten wie namen und Gruppentreffen etc-
+\def\titel{Gruppentreffen Vorlage am 24.03.2017}
+
+\def\myName{Karl-Fabian Witte}
+\def\myEmail{Karl-Fabian.Witte@haw-hamburg.de}
+
+
+\def\teilnehmer{ 
+	& Lennart Hartmann & Eduard Veit \\
+	& Alexander Mendel   & Nils Eggebrecht\\
+    & Karl-Fabian Witte   & \\
+}
+
+\def\zurKenntnis {
+	& T.Lehmann(HAW Hamburg) & Profs(HAW Hamburg) \\
+}
+% -------------------------------------------------- HIER AUFHÖREN ----------
+
+
+
+% ------------------------------------------ einige strukturell Definitionen
+\newlength{\txtw} %definiere neue länge
+\setlength{\txtw}{\textwidth} %setze neue länge auf textbreite
+\addtolength{\txtw}{-10\tabcolsep} %subtrahiere -8\cdot textbreite von asdf
+
+\def\me{\myName \newline \footnotesize{\url{\myEmail} } }
+
+\def\tablehead{
+	\hline 
+	\rowcolor{tabgrey}
+	\textbf{Nr.} & 
+	\textbf{Art} & 
+	\textbf{Stichwort und Beschreibung} & 
+	\textbf{Wer} & 
+	\textbf{Bis wann} \\
+	\hline 
+	\endhead}
+% ------------------------------------------------------------------ Inhalt	
+\begin{tabular}{p{0.65\txtw} p{0.35\txtw}}
+	\textbf{\Large{\titel}} & \me  \\
+\end{tabular}
+
+\begin{tabular}{l p{0.4\txtw} p{0.4\txtw} }
+	Teilnehmer: \teilnehmer
+	Zur Kenntnis: \zurKenntnis
+\end{tabular}
+
+\subsection*{\titel}
+\vspace{-1em}
+\begin{longtable}{
+	|p{0.04\txtw} % Nr.
+	|p{0.04\txtw} % Art
+	|p{0.62\txtw} % Stichworte und Beschreibung
+	|p{0.15\txtw} % Wer
+	|p{0.15\txtw} % Bis wann
+|}
+	\tablehead
+
+% ----------------------------------------------------------------------------
+% ---------------------------------------------------------- HIER WAS MACHEN -
+% --------------------------------------- hier kommen die Protokollpunkte hin
+% ---------------- mit \newline wird in der Tabelle ein Zeilenumbruch gemacht
+ 
+	10 & B  & Repository-Konzept Beschließen \newline
+	Ordnerstruktur: CODE/src - DOC/IMG - PROTOCOL/MEETINGS/IMG - PROTOCOL/PRAKTIKUM/IMG \newline
+		  Branchingstruktur: Remote: master + develop \newline Local: + feature (muss vor dem mergen mit dem remote upgedatet werden)
+	          & Kalle & \today \\ \hline
+10 & B  & Codingstyle Beschließen \newline
+	          & Kalle & \today \\ \hline
+10 & B  & Repository-Konzept Beschließen \newline
+	          & Kalle & \today \\ \hline
+
+% -------------------------------------------------- HIER AUFHÖREN ----------
+% ---------------------------------------------------------------------------
+
+\end{longtable}
+
+\vspace{-2.5em}
+\footnotesize
+zu Art: A - Aufforderung, B - Beschluss, E - Empfehlung, F - Feststellung \\
+\normalsize
+
+% ----------------------------------------------------------------------------
+% ---------------------------------------------------------- HIER WAS MACHEN -
+%---------------------------------------------- Infos für den nächsten Termin
+Nächstes Gruppentreffen am Dienstag den 28.03.2017 Im Etech Gebäude 
+um 13:00 Uhr. Raum steht noch aus.
+
+% -------------------------------------------------- HIER AUFHÖREN ----------
+
+% ----------------------------------------------------------------------------
+% ----------------------------------------------------------------------------
+\flushleft
+
+\end{document}
+% vim: set spell spelllang=de :EOF

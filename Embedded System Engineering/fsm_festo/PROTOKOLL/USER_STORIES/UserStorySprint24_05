@@ -1,0 +1,15 @@
+Sprint bis zum 25.5.17
+
+__User Story__ 
+
+Die Aktorik eines einzelnen Förderbandes wird nunmehr über die vorläufige MCL gesteuert. Die Erkennung eines ersten Puks setzt die Anlage in Betrieb
+,es wird für jedes Werkstück eine Datenstruktur angelegt. Verlassen des Bandes bewirkt die Löschung der zugehörigens Daten. Bei Entfernen des letzten Puks hält das Band an.
+
+Während des Durchgangs durch die Höhenmessung wird die Geschwindigkeit des Förderbandes verringert. Es findet eine Sequenzerkennung nach metallhaltig/ ohne Metall statt.
+Die Weiche leitet nicht der gewünschten Sequenz entsprechende und ungültige Höhen aufweisende Werkstücke aus.
+
+Die Profilmessung, der Signalmanager und die Fehlerüberwachung der Weiche werden durch Stubklassen simuliert, wobei in letzterem Fall ein Zähler genutzt wird.
+Buttons sind samt Beleuchtung funktionsfähig implementiert.
+
+Die Frequenz der Fehler-LEDs  wird zunächst mit Chrono realisiert.
+Die von der HAL an die MCL gesendeten Pulsemessages werden durch einen Logger protokolliert.
